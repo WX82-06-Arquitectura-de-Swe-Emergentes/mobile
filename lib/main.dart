@@ -27,6 +27,7 @@ Map<String, WidgetBuilder> _getRoutes() {
     '/filter': (context) => const FilterScreen(),
   };
 }
+
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 

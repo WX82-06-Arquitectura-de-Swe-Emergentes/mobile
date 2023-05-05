@@ -24,8 +24,8 @@ class _LoginScreenState extends State<LoginScreen> {
 
     // final email = _emailController.text;
     // final password = _passwordController.text;
-    final email = "admin";
-    final password = "admin2";
+    final email = "admin2@gmail.com";
+    final password = "admin123";
 
     final auth = Provider.of<AuthenticationProvider>(context, listen: false);
     final success = await auth.signIn(email, password);
