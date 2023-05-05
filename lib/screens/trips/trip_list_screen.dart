@@ -83,25 +83,32 @@ class TripCard extends StatelessWidget {
     final difference = trip.endDate.difference(trip.startDate);
 
     return Container(
-      padding: const EdgeInsets.all(15),
-      decoration: const BoxDecoration(
+      width: 200,
+      height: 150,
+      padding: const EdgeInsets.all(5),
+      decoration: BoxDecoration(
         color: Color.fromRGBO(22, 29, 47, 1),
+        borderRadius: BorderRadius.circular(10.0)
       ),
       child: Center(
         child: Row(
-          children: [
+          mainAxisSize: MainAxisSize.max,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          crossAxisAlignment: CrossAxisAlignment.end,
+          children: <Widget>[
             SizedBox(
               width: 300,
-              height: 200,
+              height: 300,
               child: GridView.count(
                   primary: false,
                   //padding: const EdgeInsets.all(5),
-                  crossAxisSpacing: 4,
-                  mainAxisSpacing: 4,
+                  
+                  mainAxisSpacing: 10,
                   crossAxisCount: 3,
                   children: [
                     Image.network(
                       scale: 0.3,
+                      fit: BoxFit.cover,
                       '${trip.images[0]}',
                     ),
                     Column(children: [
@@ -115,31 +122,34 @@ class TripCard extends StatelessWidget {
                       ),
                       Text(
                         '${trip.description}',
+                        textAlign: TextAlign.justify,
                         style: TextStyle(
                           color: Colors.white,
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
+                          fontSize: 14,
                         ),
                       ),
                       Text(
                         'Place: ${trip.destination.name}',
+                        textAlign: TextAlign.center,
                         style: TextStyle(
                           color: Colors.white,
-                          fontSize: 16,
+                          fontSize: 12,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
                       Text(
                         'Duration: ${difference.inDays} days',
+                        textAlign: TextAlign.justify,
                         style: TextStyle(
                           color: Colors.white,
-                          fontSize: 16,
+                          fontSize: 12,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
                     ]),
                     Text(
                       'Since: ${trip.price}',
+                      textAlign: TextAlign.center,
                       style: TextStyle(
                         color: Colors.white,
                         fontSize: 16,
