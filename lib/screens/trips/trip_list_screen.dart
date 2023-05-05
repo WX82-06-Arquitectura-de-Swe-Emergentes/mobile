@@ -77,50 +77,85 @@ class _TripListScreenState extends State<TripListScreen> {
 class TripCard extends StatelessWidget {
   const TripCard({Key? key, required this.trip}) : super(key: key);
   final Trip trip;
+
   @override
   Widget build(BuildContext context) {
+    final difference = trip.endDate.difference(trip.startDate);
+
     return Container(
-      padding: const EdgeInsets.all(15),
-      decoration: const BoxDecoration(
-        color: Colors.cyan,
+      width: 200,
+      height: 150,
+      padding: const EdgeInsets.all(5),
+      decoration: BoxDecoration(
+        color: Color.fromRGBO(22, 29, 47, 1),
+        borderRadius: BorderRadius.circular(10.0)
       ),
       child: Center(
         child: Row(
-          children: [
+          mainAxisSize: MainAxisSize.max,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          crossAxisAlignment: CrossAxisAlignment.end,
+          children: <Widget>[
             SizedBox(
               width: 300,
-              height: 200,
-              child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+              height: 300,
+              child: GridView.count(
+                  primary: false,
+                  //padding: const EdgeInsets.all(5),
+                  
+                  mainAxisSpacing: 10,
+                  crossAxisCount: 3,
                   children: [
+                    Image.network(
+                      scale: 0.3,
+                      fit: BoxFit.cover,
+                      '${trip.images[0]}',
+                    ),
+                    Column(children: [
+                      Text(
+                        '${trip.name}',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      Text(
+                        '${trip.description}',
+                        textAlign: TextAlign.justify,
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 14,
+                        ),
+                      ),
+                      Text(
+                        'Place: ${trip.destination.name}',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      Text(
+                        'Duration: ${difference.inDays} days',
+                        textAlign: TextAlign.justify,
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ]),
                     Text(
-                      '${trip.name}',
+                      'Since: ${trip.price}',
+                      textAlign: TextAlign.center,
                       style: TextStyle(
                         color: Colors.white,
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    const SizedBox(height: 4),
-                    Text(
-                      '${trip.description}',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    const SizedBox(height: 4),
-                    Text(
-                      '${trip.price}',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
                   ]),
             )
           ],
