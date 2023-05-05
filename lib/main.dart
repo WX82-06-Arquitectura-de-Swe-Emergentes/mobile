@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/providers/auth_provider.dart';
+import 'package:frontend/providers/destination_provider.dart';
+import 'package:frontend/providers/season_provider.dart';
 import 'package:frontend/providers/trip_provider.dart';
 import 'package:frontend/screens/home_screen.dart';
 import 'package:frontend/screens/login_screen.dart';
@@ -13,6 +15,9 @@ void main() {
         create: (_) => AuthenticationProvider(),
       ),
       ChangeNotifierProvider<TripProvider>(create: (_) => TripProvider()),
+      ChangeNotifierProvider<SeasonProvider>(create: (_) => SeasonProvider()),
+      ChangeNotifierProvider<DestinationProvider>(
+          create: (_) => DestinationProvider()),
     ],
     child: const MyApp(),
   ));
