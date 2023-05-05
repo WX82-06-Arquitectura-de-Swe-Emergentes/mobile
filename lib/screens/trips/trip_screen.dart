@@ -31,7 +31,7 @@ class _TripScreenState extends State<TripScreen> {
             onPressed: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => const FilterScreen()),
+                MaterialPageRoute(builder: (context) => FilterScreen(token: token)),
               );
             },
           ),

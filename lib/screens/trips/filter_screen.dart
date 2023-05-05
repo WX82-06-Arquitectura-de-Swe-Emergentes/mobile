@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 
 class FilterScreen extends StatefulWidget {
-  const FilterScreen({Key? key}) : super(key: key);
+  const FilterScreen({Key? key , required this.token}): super(key: key);
+  final String? token;
 
   @override
   _FilterScreenState createState() => _FilterScreenState();
@@ -47,20 +48,14 @@ class _FilterScreenState extends State<FilterScreen> {
             ),
             const SizedBox(height: 10),
             const Text(
-              'Confirmation time',
+              'Destination',
               textAlign: TextAlign.left,
               style: TextStyle(fontSize: 16, color: Colors.black),
             ),
-            Slider(
-              value: _currentSliderValue1,
-              max: 24,
-              divisions: 24,
-              label: _currentSliderValue1.round().toString(),
-              onChanged: (double value) {
-                setState(() {
-                  _currentSliderValue1 = value;
-                });
-              },
+            TextFormField(
+              decoration: const InputDecoration(
+                  hintText: 'Enter your destination',
+              ),
             ),
             const SizedBox(height: 10),
             const Text(
