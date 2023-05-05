@@ -3,6 +3,7 @@ import 'package:frontend/providers/auth_provider.dart';
 import 'package:frontend/providers/trip_provider.dart';
 import 'package:frontend/screens/home_screen.dart';
 import 'package:frontend/screens/login_screen.dart';
+import 'package:frontend/screens/register_screen.dart';
 import 'package:frontend/screens/trips/filter_screen.dart';
 import 'package:frontend/screens/trips/trip_screen.dart';
 import 'package:provider/provider.dart';
@@ -23,6 +24,7 @@ Map<String, WidgetBuilder> _getRoutes() {
   return {
     '/': (context) => const MyHomePage(),
     '/signin': (context) => const LoginScreen(),
+    '/signup': (context) => const RegisterScreen(),
     '/trip': (context) => const TripScreen(),
     '/filter': (context) => const FilterScreen(),
   };

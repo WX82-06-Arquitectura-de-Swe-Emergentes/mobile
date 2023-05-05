@@ -4,22 +4,22 @@ import 'package:frontend/shared/globals.dart';
 import 'package:provider/provider.dart';
 import 'package:frontend/providers/auth_provider.dart';
 
-class LoginScreen extends StatefulWidget {
-  const LoginScreen({super.key});
+class RegisterScreen extends StatefulWidget {
+  const RegisterScreen({super.key});
 
   @override
   // ignore: library_private_types_in_public_api
-  _LoginScreenState createState() => _LoginScreenState();
+  _RegisterScreenState createState() => _RegisterScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
+class _RegisterScreenState extends State<RegisterScreen> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   bool _isLoading = false;
   bool _obscurePassword = true;
   Map<String, List<dynamic>> _formErrors = {};
 
-  void _handleLogin() async {
+  void _handleRegister() async {
     setState(() {
       _isLoading = true;
       _formErrors = {};
@@ -32,7 +32,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
     try {
       // ignore: use_build_context_synchronously
-      await auth.signIn(email, password);
+      await auth.signUp(email, password);
       // ignore: use_build_context_synchronously
       Navigator.of(context).pushReplacementNamed('/trip');
     } on ApiException catch (e) {
@@ -92,7 +92,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     child: Image(image: AssetImage('images/logo.png')),
                   ),
                   Text(
-                    'Sign In',
+                    'Sign Up',
                     style: TextStyle(
                       fontSize: 24.0,
                       fontWeight: FontWeight.bold,
@@ -101,7 +101,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                   SizedBox(height: 16.0),
                   Text(
-                    'Please login to continue',
+                    'Create an account to continue',
                     style: TextStyle(
                       fontSize: 16.0,
                       color: Colors.grey,
@@ -171,20 +171,20 @@ class _LoginScreenState extends State<LoginScreen> {
                   .toList(),
             const SizedBox(height: 32.0),
             ElevatedButton(
-              onPressed: _isLoading ? null : _handleLogin,
+              onPressed: _isLoading ? null : _handleRegister,
               child: _isLoading
                   ? const CircularProgressIndicator()
-                  : const Text('Login to your account'),
+                  : const Text('SIGN UP'),
             ),
             const SizedBox(height: 16.0),
             RichText(
               textAlign: TextAlign.center,
               text: TextSpan(
-                text: "Dont' have an account? ",
+                text: "Already have an account? ",
                 style: const TextStyle(color: Colors.white),
                 children: <TextSpan>[
                   TextSpan(
-                    text: 'Sign up',
+                    text: 'Sign in',
                     style: const TextStyle(
                       color: Colors.red,
                       fontWeight: FontWeight.bold,
@@ -192,7 +192,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     recognizer: TapGestureRecognizer()
                       ..onTap = () {
                         // Lógica del enlace aquí
-                        Navigator.of(context).pushNamed('/signup');
+                        Navigator.of(context).pushNamed('/signin');
                       },
                   ),
                 ],
