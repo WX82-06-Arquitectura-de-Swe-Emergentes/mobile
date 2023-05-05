@@ -3,6 +3,7 @@
 //     final trip = tripFromJson(jsonString);
 
 import 'dart:convert';
+import 'dart:ffi';
 
 Trip tripFromJson(String str) => Trip.fromJson(json.decode(str));
 
@@ -14,7 +15,7 @@ class Trip {
   String description;
   DateTime startDate;
   DateTime endDate;
-  int price;
+  double price;
   String difficulty;
   String status;
   String groupSize;
@@ -101,8 +102,8 @@ class Itinerary {
   int id;
   int day;
   String location;
-  int latitude;
-  int longitude;
+  double latitude;
+  double longitude;
   List<String> activities;
 
   Itinerary({

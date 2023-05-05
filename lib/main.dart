@@ -1,25 +1,32 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/providers/auth_provider.dart';
+import 'package:frontend/providers/trip_provider.dart';
 import 'package:frontend/screens/home_screen.dart';
 import 'package:frontend/screens/login_screen.dart';
+import 'package:frontend/screens/trips/filter_screen.dart';
+import 'package:frontend/screens/trips/trip_screen.dart';
 import 'package:provider/provider.dart';
 
 void main() {
-  runApp(
-    ChangeNotifierProvider<AuthenticationProvider>(
-      create: (_) => AuthenticationProvider(),
-      child: const MyApp(),
-    ),
-  );
+  runApp(MultiProvider(
+    providers: [
+      ChangeNotifierProvider<AuthenticationProvider>(
+        create: (_) => AuthenticationProvider(),
+      ),
+      ChangeNotifierProvider<TripProvider>(create: (_) => TripProvider()),
+    ],
+    child: const MyApp(),
+  ));
 }
 
 Map<String, WidgetBuilder> _getRoutes() {
   return {
     '/': (context) => const MyHomePage(),
     '/signin': (context) => const LoginScreen(),
+    '/trip': (context) => const TripScreen(),
+    '/filter': (context) => const FilterScreen(),
   };
 }
-
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 

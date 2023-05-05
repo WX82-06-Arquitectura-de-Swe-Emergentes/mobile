@@ -4,7 +4,8 @@ import 'package:frontend/providers/trip_provider.dart';
 import 'package:provider/provider.dart';
 
 class TripListScreen extends StatefulWidget {
-  const TripListScreen({Key? key}) : super(key: key);
+  const TripListScreen({Key? key, required this.token}) : super(key: key);
+  final String? token;
 
   @override
   _TripListScreenState createState() => _TripListScreenState();
@@ -30,7 +31,7 @@ class _TripListScreenState extends State<TripListScreen> {
       listen: false,
     );
     if (tripProvider.trips.isEmpty) {
-      await tripProvider.getTrips();
+      await tripProvider.getTrips(widget.token);
     }
   }
 
@@ -51,7 +52,7 @@ class _TripListScreenState extends State<TripListScreen> {
               setState(() {
                 isLoading.value = true;
               });
-              await tripProvider.getTrips();
+              await tripProvider.getTrips(widget.token);
               setState(() {
                 isLoading.value = false;
               });
@@ -59,6 +60,8 @@ class _TripListScreenState extends State<TripListScreen> {
             child: trips.isEmpty
                 ? const Center(child: Text('No hay viajes disponibles'))
                 : ListView.separated(
+                    scrollDirection: Axis.vertical,
+                    shrinkWrap: true,
                     padding: const EdgeInsets.all(16),
                     itemBuilder: (ct, i) => TripCard(trip: trips[i]),
                     separatorBuilder: (_, __) => const SizedBox(height: 16),
@@ -86,6 +89,7 @@ class TripCard extends StatelessWidget {
           children: [
             SizedBox(
               width: 300,
+              height: 200,
               child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [

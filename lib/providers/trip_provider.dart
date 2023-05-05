@@ -20,9 +20,9 @@ class TripProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> getTrips() async {
+  Future<void> getTrips(String? token) async {
     try {
-      _trips = await service.getTrips();
+      _trips = await service.getTrips(token);
       _filteredTrips = _trips;
       return;
     } catch (e) {
