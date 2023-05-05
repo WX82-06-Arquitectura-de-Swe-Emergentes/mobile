@@ -13,19 +13,23 @@ class TripScreen extends StatefulWidget {
 }
 
 class _TripScreenState extends State<TripScreen> {
-
   @override
   Widget build(BuildContext context) {
     final authProvider = Provider.of<AuthenticationProvider>(context);
     final token = authProvider.token;
 
     return Scaffold(
+      backgroundColor: Color.fromARGB(16, 20, 30, 1),
       bottomNavigationBar: const AppBarBack(),
-      appBar: AppBar(),
+      appBar: AppBar(
+        title: const Text("Trips"),
+        backgroundColor: Color.fromRGBO(252, 71, 71, 1),
+      ),
       body: Column(
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
+          Text("Sort By : "),
           TextButton(
             child: const Text("Filtrar"),
             onPressed: () {

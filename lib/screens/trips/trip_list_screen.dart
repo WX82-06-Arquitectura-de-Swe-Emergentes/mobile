@@ -77,12 +77,15 @@ class _TripListScreenState extends State<TripListScreen> {
 class TripCard extends StatelessWidget {
   const TripCard({Key? key, required this.trip}) : super(key: key);
   final Trip trip;
+
   @override
   Widget build(BuildContext context) {
+    final difference = trip.endDate.difference(trip.startDate);
+
     return Container(
       padding: const EdgeInsets.all(15),
       decoration: const BoxDecoration(
-        color: Colors.cyan,
+        color: Color.fromRGBO(22, 29, 47, 1),
       ),
       child: Center(
         child: Row(
@@ -90,37 +93,59 @@ class TripCard extends StatelessWidget {
             SizedBox(
               width: 300,
               height: 200,
-              child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+              child: GridView.count(
+                  primary: false,
+                  //padding: const EdgeInsets.all(5),
+                  crossAxisSpacing: 4,
+                  mainAxisSpacing: 4,
+                  crossAxisCount: 3,
                   children: [
+                    Image.network(
+                      scale: 0.3,
+                      '${trip.images[0]}',
+                    ),
+                    Column(children: [
+                      Text(
+                        '${trip.name}',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      Text(
+                        '${trip.description}',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      Text(
+                        'Place: ${trip.destination.name}',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      Text(
+                        'Duration: ${difference.inDays} days',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ]),
                     Text(
-                      '${trip.name}',
+                      'Since: ${trip.price}',
                       style: TextStyle(
                         color: Colors.white,
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    const SizedBox(height: 4),
-                    Text(
-                      '${trip.description}',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    const SizedBox(height: 4),
-                    Text(
-                      '${trip.price}',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
                   ]),
             )
           ],
