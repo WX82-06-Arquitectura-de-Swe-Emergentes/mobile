@@ -19,23 +19,24 @@ class _TripScreenState extends State<TripScreen> {
     final token = authProvider.token;
 
     return Scaffold(
-      backgroundColor: Color.fromARGB(16, 20, 30, 1),
+      backgroundColor: const Color.fromARGB(16, 20, 30, 1),
       bottomNavigationBar: const AppBarBack(),
       appBar: AppBar(
         title: const Text("Trips"),
-        backgroundColor: Color.fromRGBO(252, 71, 71, 1),
+        backgroundColor: const Color.fromRGBO(252, 71, 71, 1),
       ),
       body: Column(
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Text("Sort By : "),
+          const Text("Sort By : "),
           TextButton(
             child: const Text("Filtrar"),
             onPressed: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => FilterScreen(token: token)),
+                MaterialPageRoute(
+                    builder: (context) => FilterScreen(token: token)),
               );
             },
           ),
