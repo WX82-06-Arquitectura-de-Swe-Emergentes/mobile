@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:frontend/providers/auth_provider.dart';
 import 'package:frontend/screens/trips/filter_screen.dart';
 import 'package:frontend/screens/trips/trip_list_screen.dart';
+import 'package:frontend/shared/globals.dart';
 import 'package:frontend/widgets/app_bar.dart';
 import 'package:provider/provider.dart';
 
@@ -19,11 +20,11 @@ class _TripScreenState extends State<TripScreen> {
     final token = authProvider.token;
 
     return Scaffold(
-      backgroundColor: const Color.fromARGB(16, 20, 30, 1),
+      backgroundColor: Globals.backgroundColor,
       bottomNavigationBar: const AppBarBack(),
       appBar: AppBar(
         title: const Text("Trips"),
-        backgroundColor: const Color.fromRGBO(252, 71, 71, 1),
+        backgroundColor: Globals.redColor,
       ),
       body: Column(
         mainAxisAlignment: MainAxisAlignment.start,
@@ -40,7 +41,7 @@ class _TripScreenState extends State<TripScreen> {
               );
             },
           ),
-          TripListScreen(token: token),
+          TripListScreen(token: token!),
         ],
       ),
     );

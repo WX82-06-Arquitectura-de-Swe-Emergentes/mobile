@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/shared/globals.dart';
 
 class AppBarBack extends StatefulWidget {
   const AppBarBack({super.key});
@@ -17,7 +18,7 @@ class _AppBarBackState extends State<AppBarBack> {
           index = i;
         },
         type: BottomNavigationBarType.fixed,
-        backgroundColor: Color.fromRGBO(22, 29, 47, 1),
+        backgroundColor: Globals.primaryColor,
         selectedItemColor: Colors.blueGrey,
         iconSize: 25.0,
         selectedFontSize: 14.0,
