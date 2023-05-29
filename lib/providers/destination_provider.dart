@@ -7,23 +7,15 @@ class DestinationProvider extends ChangeNotifier {
 
   List<Destination> _destination = [];
   List<Destination> get destination => _destination;
-  set trips(List<Destination> value) {
+  set destintion(List<Destination> value) {
     _destination = value;
     notifyListeners();
   }
 
-  List<Destination> _filteredTrips = [];
-  List<Destination> get filteredTrips => _filteredTrips;
-  set filteredTrips(List<Destination> filteredTrips) {
-    _filteredTrips = filteredTrips;
-    notifyListeners();
-  }
-
-  Future<void> getDetination(String? token) async {
+  Future<List<Destination>> getDestinations(String? token) async {
     try {
-      _destination = (await service.getDestinations(token)).cast<Destination>();
-      _filteredTrips = _destination;
-      return;
+      _destination = await service.getDestinations(token);
+      return _destination;
     } catch (e) {
       throw Exception('Failed to load data');
     }
@@ -31,7 +23,6 @@ class DestinationProvider extends ChangeNotifier {
 
   void resetData() {
     _destination = [];
-    _filteredTrips = [];
     notifyListeners();
   }
 }

@@ -39,8 +39,9 @@ class _TripListScreenState extends State<TripListScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final tripProvider = Provider.of<TripProvider>(context, listen: false);
+    final tripProvider = Provider.of<TripProvider>(context, listen: true);
     final trips = tripProvider.trips;
+    
     return ValueListenableBuilder<bool>(
       valueListenable: isLoading,
       builder: (ct, value, _) {
@@ -54,7 +55,7 @@ class _TripListScreenState extends State<TripListScreen> {
               setState(() {
                 isLoading.value = true;
               });
-              await tripProvider.getTrips(widget.token);
+              await getData();
               setState(() {
                 isLoading.value = false;
               });
