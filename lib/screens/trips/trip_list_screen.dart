@@ -41,7 +41,7 @@ class _TripListScreenState extends State<TripListScreen> {
   Widget build(BuildContext context) {
     final tripProvider = Provider.of<TripProvider>(context, listen: true);
     final trips = tripProvider.trips;
-    
+
     return ValueListenableBuilder<bool>(
       valueListenable: isLoading,
       builder: (ct, value, _) {
@@ -66,7 +66,8 @@ class _TripListScreenState extends State<TripListScreen> {
                     scrollDirection: Axis.vertical,
                     shrinkWrap: true,
                     padding: const EdgeInsets.all(16),
-                    itemBuilder: (ct, i) => TripCard(trip: trips[i],token: widget.token),
+                    itemBuilder: (ct, i) =>
+                        TripCard(trip: trips[i], token: widget.token),
                     separatorBuilder: (_, __) => const SizedBox(height: 16),
                     itemCount: trips.length,
                   ),
@@ -78,7 +79,8 @@ class _TripListScreenState extends State<TripListScreen> {
 }
 
 class TripCard extends StatelessWidget {
-  const TripCard({Key? key, required this.trip, required this.token}) : super(key: key);
+  const TripCard({Key? key, required this.trip, required this.token})
+      : super(key: key);
   final Trip trip;
   final String token;
 
@@ -105,7 +107,8 @@ class TripCard extends StatelessWidget {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => TripDetailsScreen(trip: trip,token: token),
+                      builder: (context) =>
+                          TripDetailsScreen(trip: trip, token: token),
                     ),
                   );
                 },
@@ -114,7 +117,7 @@ class TripCard extends StatelessWidget {
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(10),
                     child: Image.network(
-                      '${trip.images[0]}',
+                      trip.images[0],
                       fit: BoxFit.cover,
                     ),
                   ),

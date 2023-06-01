@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:dropdown_search/dropdown_search.dart';
+import 'package:frontend/models/season.dart';
 import 'package:frontend/models/trip.dart';
 import 'package:frontend/providers/auth_provider.dart';
 import 'package:frontend/providers/destination_provider.dart';
+import 'package:frontend/providers/season_provider.dart';
 import 'package:frontend/providers/trip_provider.dart';
 import 'package:provider/provider.dart';
 
@@ -21,23 +23,37 @@ class _FilterScreenState extends State<FilterScreen> {
   final double _currentSliderValue = 20;
   final double _currentSliderValue1 = 1;
   String? _selectedDestination;
+  String? _selectedSeason;
   List<Destination> destinations = [];
+  List<Season> seasons = [];
 
   @override
   void initState() {
     super.initState();
-    
-    getDestinations().then((value) {
 
-      if(!value.isEmpty) {
-        _selectedDestination = value[0].name;
-      }
+    getDestinations().then(
+      (value) {
+        if (!value.isEmpty) {
+          _selectedDestination = value[0].name;
+        }
 
-      setState(() {
-        destinations = value;
-      });
-    });
+        setState(() {
+          destinations = value;
+        });
+      },
+    );
 
+    getSeasons().then(
+      (value) {
+        if (!value.isEmpty) {
+          _selectedSeason = value[0].name;
+        }
+
+        setState(() {
+          seasons = value;
+        });
+      },
+    );
   }
 
   Future getDestinations() async {
@@ -52,10 +68,22 @@ class _FilterScreenState extends State<FilterScreen> {
     }
   }
 
+  Future getSeasons() async {
+    final seasonProvider = Provider.of<SeasonProvider>(
+      context,
+      listen: false,
+    );
+    if (seasonProvider.season.isEmpty) {
+      return await seasonProvider.getSeasons(widget.token);
+    } else {
+      return seasonProvider.season;
+    }
+  }
+
   void _applyFilters() {
     final Filter filters = Filter(
       destination: _selectedDestination,
-      season: null,
+      season: _selectedSeason,
     );
     final tripProvider = Provider.of<TripProvider>(
       context,
@@ -100,7 +128,27 @@ class _FilterScreenState extends State<FilterScreen> {
                   _selectedDestination = value;
                 });
               },
-              selectedItem: destinations.isNotEmpty ? destinations[0].name : null,
+              selectedItem:
+                  destinations.isNotEmpty ? destinations[0].name : null,
+            ),
+            const SizedBox(height: 10.0),
+            DropdownSearch<String>(
+              popupProps: PopupProps.menu(
+                showSelectedItems: true,
+                disabledItemFn: (String s) => s.startsWith('I'),
+              ),
+              items: seasons.map((e) => e.name).toList(),
+              dropdownDecoratorProps: const DropDownDecoratorProps(
+                dropdownSearchDecoration: InputDecoration(
+                  labelText: "Season",
+                ),
+              ),
+              onChanged: (value) {
+                setState(() {
+                  _selectedSeason = value;
+                });
+              },
+              selectedItem: seasons.isNotEmpty ? seasons[0].name : null,
             )
           ],
         ),
