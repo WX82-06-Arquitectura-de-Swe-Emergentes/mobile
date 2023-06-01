@@ -20,7 +20,7 @@ enum Character { group, private }
 
 class _FilterScreenState extends State<FilterScreen> {
   Character? _character = Character.group;
-  final double _currentSliderValue = 20;
+  double _currentSliderValue = 1000;
   final double _currentSliderValue1 = 1;
   String? _selectedDestination;
   String? _selectedSeason;
@@ -84,6 +84,8 @@ class _FilterScreenState extends State<FilterScreen> {
     final Filter filters = Filter(
       destination: _selectedDestination,
       season: _selectedSeason,
+      minPrice: _currentSliderValue1,
+      maxPrice: _currentSliderValue,
     );
     final tripProvider = Provider.of<TripProvider>(
       context,
@@ -149,6 +151,21 @@ class _FilterScreenState extends State<FilterScreen> {
                 });
               },
               selectedItem: seasons.isNotEmpty ? seasons[0].name : null,
+            ),
+            const SizedBox(height: 10.0),
+            const Text('Price Range',
+                style: TextStyle(color: Color.fromARGB(255, 97, 97, 97))),
+            const SizedBox(height: 10.0),
+            Slider(
+              value: _currentSliderValue,
+              max: 10000,
+              divisions: 20,
+              label: _currentSliderValue.round().toString(),
+              onChanged: (double _value) {
+                setState(() {
+                  _currentSliderValue = _value;
+                });
+              },
             )
           ],
         ),

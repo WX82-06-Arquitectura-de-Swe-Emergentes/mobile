@@ -30,7 +30,6 @@ class _TripScreenState extends State<TripScreen> {
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          const Text("Sort By : "),
           TextButton(
             child: const Text("Filtrar"),
             onPressed: () {

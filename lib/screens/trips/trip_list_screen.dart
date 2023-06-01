@@ -141,6 +141,7 @@ class TripCard extends StatelessWidget {
                 const SizedBox(height: 8),
                 Text(
                   trip.description,
+                  maxLines: 2,
                   style: const TextStyle(
                     color: Colors.white,
                     fontSize: 12,
@@ -149,6 +150,7 @@ class TripCard extends StatelessWidget {
                 const SizedBox(height: 8),
                 Text(
                   'Place: ${trip.destination.name}',
+                  maxLines: 2,
                   style: const TextStyle(
                     color: Colors.white,
                     fontSize: 14,
