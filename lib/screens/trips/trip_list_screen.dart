@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/models/trip.dart';
+import 'package:frontend/providers/auth_provider.dart';
 import 'package:frontend/providers/trip_provider.dart';
 import 'package:frontend/screens/trips/trip_details.dart';
 import 'package:frontend/shared/globals.dart';
 import 'package:provider/provider.dart';
 
 class TripListScreen extends StatefulWidget {
-  const TripListScreen({Key? key, required this.token}) : super(key: key);
-  final String token;
+  const TripListScreen({Key? key, required this.auth}) : super(key: key);
+  final AuthenticationProvider auth;
 
   @override
   _TripListScreenState createState() => _TripListScreenState();
@@ -33,7 +34,7 @@ class _TripListScreenState extends State<TripListScreen> {
       listen: false,
     );
     if (tripProvider.trips.isEmpty) {
-      await tripProvider.getTrips(widget.token);
+      await tripProvider.getTrips(widget.auth.token);
     }
   }
 
@@ -67,7 +68,7 @@ class _TripListScreenState extends State<TripListScreen> {
                     shrinkWrap: true,
                     padding: const EdgeInsets.all(16),
                     itemBuilder: (ct, i) =>
-                        TripCard(trip: trips[i], token: widget.token),
+                        TripCard(trip: trips[i], auth: widget.auth),
                     separatorBuilder: (_, __) => const SizedBox(height: 16),
                     itemCount: trips.length,
                   ),
@@ -79,10 +80,10 @@ class _TripListScreenState extends State<TripListScreen> {
 }
 
 class TripCard extends StatelessWidget {
-  const TripCard({Key? key, required this.trip, required this.token})
+  const TripCard({Key? key, required this.trip, required this.auth})
       : super(key: key);
   final Trip trip;
-  final String token;
+  final AuthenticationProvider auth;
 
   @override
   Widget build(BuildContext context) {
@@ -108,7 +109,7 @@ class TripCard extends StatelessWidget {
                     context,
                     MaterialPageRoute(
                       builder: (context) =>
-                          TripDetailsScreen(trip: trip, token: token),
+                          TripDetailsScreen(trip: trip, auth: auth),
                     ),
                   );
                 },

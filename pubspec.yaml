@@ -39,6 +39,9 @@ dependencies:
   provider: ^6.0.5
   dropdown_search: ^5.0.6
   google_maps_flutter: ^2.0.6
+  firebase_core: ^2.13.1
+  firebase_database: ^10.2.2
+  intl: ^0.18.1
 
 dev_dependencies:
   flutter_test:

@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "472744565934",
+    "firebase_url": "https://adventurehub-8d4bc-default-rtdb.firebaseio.com",
+    "project_id": "adventurehub-8d4bc",
+    "storage_bucket": "adventurehub-8d4bc.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:472744565934:android:c86867559bf74ec4b8613f",
+        "android_client_info": {
+          "package_name": "com.example.frontend"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "472744565934-90vt8pa2vt7fcaq891igbf2gg0horc3a.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB7muDtcR-ApUfXuCh3iB02uXmCriGHqhU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "472744565934-90vt8pa2vt7fcaq891igbf2gg0horc3a.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

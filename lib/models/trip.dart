@@ -19,6 +19,8 @@ class Trip {
   String difficulty;
   String status;
   String groupSize;
+  String agencyName;
+
   String category;
   String season;
   Destination destination;
@@ -35,6 +37,7 @@ class Trip {
     required this.difficulty,
     required this.status,
     required this.groupSize,
+    required this.agencyName,
     required this.category,
     required this.season,
     required this.destination,
@@ -52,6 +55,7 @@ class Trip {
         difficulty: json["difficulty"],
         status: json["status"],
         groupSize: json["group_size"],
+        agencyName: json["agency_name"],
         category: json["category"],
         season: json["season"],
         destination: Destination.fromJson(json["destination"]),
@@ -70,6 +74,7 @@ class Trip {
         "difficulty": difficulty,
         "status": status,
         "group_size": groupSize,
+        "agency_name": agencyName,
         "category": category,
         "season": season,
         "destination": destination.toJson(),
