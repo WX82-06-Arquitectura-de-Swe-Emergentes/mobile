@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/models/season.dart';
 import 'package:frontend/services/season_service.dart';
-import 'package:frontend/services/trip_service.dart';
 
 class SeasonProvider extends ChangeNotifier {
   final service = SeasonService();
@@ -13,18 +12,10 @@ class SeasonProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  List<Season> _filteredTrips = [];
-  List<Season> get filteredTrips => _filteredTrips;
-  set filteredTrips(List<Season> filteredTrips) {
-    _filteredTrips = filteredTrips;
-    notifyListeners();
-  }
-
-  Future<void> getSeasons(String? token) async {
+  Future<List<Season>> getSeasons(String? token) async {
     try {
       _season = await service.getSeasons(token);
-      _filteredTrips = _season;
-      return;
+      return _season;
     } catch (e) {
       throw Exception('Failed to load data');
     }
@@ -32,7 +23,6 @@ class SeasonProvider extends ChangeNotifier {
 
   void resetData() {
     _season = [];
-    _filteredTrips = [];
     notifyListeners();
   }
 }

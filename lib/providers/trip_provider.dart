@@ -13,17 +13,19 @@ class TripProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  List<Trip> _filteredTrips = [];
-  List<Trip> get filteredTrips => _filteredTrips;
-  set filteredTrips(List<Trip> filteredTrips) {
-    _filteredTrips = filteredTrips;
-    notifyListeners();
-  }
-
   Future<void> getTrips(String? token) async {
     try {
       _trips = await service.getTrips(token);
-      _filteredTrips = _trips;
+      return;
+    } catch (e) {
+      throw Exception('Failed to load data');
+    }
+  }
+
+  Future<void> getTripsFilter(String? token,Filter filters) async {
+    try {
+      _trips = await service.getTripsFilter(token,filters);
+      notifyListeners();
       return;
     } catch (e) {
       throw Exception('Failed to load data');
@@ -32,7 +34,6 @@ class TripProvider extends ChangeNotifier {
 
   void resetData() {
     _trips = [];
-    _filteredTrips = [];
     notifyListeners();
   }
 }

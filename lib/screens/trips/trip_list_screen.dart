@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/models/trip.dart';
+import 'package:frontend/providers/auth_provider.dart';
 import 'package:frontend/providers/trip_provider.dart';
+import 'package:frontend/screens/trips/trip_details.dart';
+import 'package:frontend/shared/globals.dart';
 import 'package:provider/provider.dart';
 
 class TripListScreen extends StatefulWidget {
-  const TripListScreen({Key? key, required this.token}) : super(key: key);
-  final String? token;
+  const TripListScreen({Key? key, required this.auth}) : super(key: key);
+  final AuthenticationProvider auth;
 
   @override
   _TripListScreenState createState() => _TripListScreenState();
@@ -31,14 +34,15 @@ class _TripListScreenState extends State<TripListScreen> {
       listen: false,
     );
     if (tripProvider.trips.isEmpty) {
-      await tripProvider.getTrips(widget.token);
+      await tripProvider.getTrips(widget.auth.token);
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    final tripProvider = Provider.of<TripProvider>(context, listen: false);
+    final tripProvider = Provider.of<TripProvider>(context, listen: true);
     final trips = tripProvider.trips;
+
     return ValueListenableBuilder<bool>(
       valueListenable: isLoading,
       builder: (ct, value, _) {
@@ -52,7 +56,7 @@ class _TripListScreenState extends State<TripListScreen> {
               setState(() {
                 isLoading.value = true;
               });
-              await tripProvider.getTrips(widget.token);
+              await getData();
               setState(() {
                 isLoading.value = false;
               });
@@ -63,7 +67,8 @@ class _TripListScreenState extends State<TripListScreen> {
                     scrollDirection: Axis.vertical,
                     shrinkWrap: true,
                     padding: const EdgeInsets.all(16),
-                    itemBuilder: (ct, i) => TripCard(trip: trips[i]),
+                    itemBuilder: (ct, i) =>
+                        TripCard(trip: trips[i], auth: widget.auth),
                     separatorBuilder: (_, __) => const SizedBox(height: 16),
                     itemCount: trips.length,
                   ),
@@ -75,8 +80,10 @@ class _TripListScreenState extends State<TripListScreen> {
 }
 
 class TripCard extends StatelessWidget {
-  const TripCard({Key? key, required this.trip}) : super(key: key);
+  const TripCard({Key? key, required this.trip, required this.auth})
+      : super(key: key);
   final Trip trip;
+  final AuthenticationProvider auth;
 
   @override
   Widget build(BuildContext context) {
@@ -87,7 +94,7 @@ class TripCard extends StatelessWidget {
       height: 180,
       padding: const EdgeInsets.all(8),
       decoration: BoxDecoration(
-        color: Color.fromRGBO(22, 29, 47, 1),
+        color: Globals.primaryColor,
         borderRadius: BorderRadius.circular(10),
       ),
       child: Row(
@@ -98,19 +105,12 @@ class TripCard extends StatelessWidget {
               aspectRatio: 1,
               child: GestureDetector(
                 onTap: () {
-                  showDialog(
-                    context: context,
-                    builder: (context) {
-                      return AlertDialog(
-                        title: Text('Coming Soon!'),
-                        actions: <Widget>[
-                          TextButton(
-                            onPressed: () => Navigator.pop(context),
-                            child: Text('OK'),
-                          ),
-                        ],
-                      );
-                    },
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) =>
+                          TripDetailsScreen(trip: trip, auth: auth),
+                    ),
                   );
                 },
                 child: AspectRatio(
@@ -118,7 +118,7 @@ class TripCard extends StatelessWidget {
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(10),
                     child: Image.network(
-                      '${trip.images[0]}',
+                      trip.images[0],
                       fit: BoxFit.cover,
                     ),
                   ),
@@ -126,50 +126,52 @@ class TripCard extends StatelessWidget {
               ),
             ),
           ),
-          SizedBox(width: 16),
+          const SizedBox(width: 16),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   trip.name,
-                  style: TextStyle(
-                    color: Colors.red,
+                  style: const TextStyle(
+                    color: Colors.white,
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                SizedBox(height: 8),
+                const SizedBox(height: 8),
                 Text(
                   trip.description,
-                  style: TextStyle(
+                  maxLines: 2,
+                  style: const TextStyle(
                     color: Colors.white,
                     fontSize: 12,
                   ),
                 ),
-                SizedBox(height: 8),
+                const SizedBox(height: 8),
                 Text(
                   'Place: ${trip.destination.name}',
-                  style: TextStyle(
+                  maxLines: 2,
+                  style: const TextStyle(
                     color: Colors.white,
                     fontSize: 14,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                SizedBox(height: 8),
+                const SizedBox(height: 8),
                 Text(
                   'Duration: ${difference.inDays} days',
-                  style: TextStyle(
+                  style: const TextStyle(
                     color: Colors.white,
                     fontSize: 14,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                Spacer(),
+                const Spacer(),
                 Text(
                   'Since: ${trip.price}',
                   textAlign: TextAlign.center,
-                  style: TextStyle(
+                  style: const TextStyle(
                     color: Colors.white,
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
