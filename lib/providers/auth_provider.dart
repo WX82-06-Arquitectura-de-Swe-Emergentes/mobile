@@ -5,8 +5,10 @@ import 'package:frontend/services/authentication_service.dart';
 
 class AuthenticationProvider extends ChangeNotifier {
   String? _token;
+  String _username = "";
 
   String? get token => _token;
+  String get username => _username;
 
   final _authenticationService = AuthenticationService();
 
@@ -16,6 +18,7 @@ class AuthenticationProvider extends ChangeNotifier {
     if (response.statusCode == 200) {
       final jsonBody = jsonDecode(response.body);
       _token = jsonBody["token"];
+      _username = jsonBody["username"] ?? "";
       notifyListeners();
       return;
     }

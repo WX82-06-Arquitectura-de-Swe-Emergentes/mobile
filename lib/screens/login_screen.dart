@@ -1,5 +1,6 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:frontend/screens/trips/trip_screen.dart';
 import 'package:frontend/shared/globals.dart';
 import 'package:provider/provider.dart';
 import 'package:frontend/providers/auth_provider.dart';
@@ -33,8 +34,12 @@ class _LoginScreenState extends State<LoginScreen> {
     try {
       // ignore: use_build_context_synchronously
       await auth.signIn(email, password);
+      // Navigator.of(context).pushReplacementNamed('/trip');
       // ignore: use_build_context_synchronously
-      Navigator.of(context).pushReplacementNamed('/trip');
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => TripScreen(auth: auth)),
+      );
     } on ApiException catch (e) {
       if (e.message != '') {
         // Si el login falla, muestra un mensaje de error

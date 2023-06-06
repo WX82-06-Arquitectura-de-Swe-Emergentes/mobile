@@ -1,17 +1,21 @@
-import 'dart:convert';
-
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
+import 'package:frontend/firebase/chat/chat.dart';
+import 'package:frontend/firebase/chat/chatDao.dart';
+import 'package:frontend/firebase/member/memberDao.dart';
+import 'package:frontend/firebase/message/messageDao.dart';
 import 'package:frontend/models/review.dart';
 import 'package:frontend/models/trip.dart';
+import 'package:frontend/providers/auth_provider.dart';
 import 'package:frontend/services/api_service.dart';
 import 'package:frontend/shared/globals.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 class TripDetailsScreen extends StatefulWidget {
   final Trip trip;
-  final String token;
+  final AuthenticationProvider auth;
 
-  TripDetailsScreen({Key? key, required this.trip, required this.token})
+  TripDetailsScreen({Key? key, required this.trip, required this.auth})
       : super(key: key);
 
   @override
@@ -22,6 +26,9 @@ class _TripDetailsScreenState extends State<TripDetailsScreen> {
   List<Review> reviews = [];
   bool showAllReviews = false;
   bool showAllItineraries = false;
+  ChatDao chatDao = ChatDao();
+  MessageDao messageDao = MessageDao();
+  MemberDao memberDao = MemberDao();
 
   @override
   void initState() {
@@ -30,7 +37,9 @@ class _TripDetailsScreenState extends State<TripDetailsScreen> {
   }
 
   void fetchTripReviews(int tripId) async {
-    Map<String, String> headers = {'Authorization': 'Bearer ${widget.token}'};
+    Map<String, String> headers = {
+      'Authorization': 'Bearer ${widget.auth.token}'
+    };
     String idString = tripId.toString();
     String url = '/ratings?tripId=$idString';
     final response = await ApiService.get(url, headers);
@@ -159,6 +168,85 @@ class _TripDetailsScreenState extends State<TripDetailsScreen> {
                       },
                     ),
                   ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 16.0),
+          Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    ElevatedButton(
+                      onPressed: () {
+                        final username = widget.auth.username;
+                        final agencyName = widget.trip.agencyName;
+                        DatabaseReference chatRef = chatDao.getChatRef().push();
+                        DatabaseReference memberRef =
+                            memberDao.getMemberRef().push();
+
+                        Chat chat = Chat(
+                            title: widget.trip.name,
+                            lastMessage: "",
+                            timestamp: DateTime.now().millisecondsSinceEpoch);
+
+                        chatRef.set(chat.toJson()).then((value) {
+                          final chatId = chatRef.key;
+
+                          DatabaseReference memberChatRef = FirebaseDatabase
+                              .instance
+                              .ref()
+                              .child("members/${chatId}");
+                          memberChatRef.set({username: true, agencyName: true});
+                        });
+
+                        // display a dialog to the user
+                        showDialog(
+                            context: context,
+                            builder: (BuildContext context) {
+                              return AlertDialog(
+                                title: const Text('Chat'),
+                                content: const Text(
+                                    'You have successfully created a chat!'),
+                                actions: [
+                                  TextButton(
+                                      onPressed: () {
+                                        Navigator.of(context).pop();
+                                      },
+                                      child: const Text('OK'))
+                                ],
+                              );
+                            });
+
+                      },
+                      child: const Icon(Icons.chat, color: Colors.white),
+                    )
+                  ])),
+          const SizedBox(height: 16.0),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  'PRICE',
+                  style: TextStyle(
+                    fontSize: 20.0,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                ),
+                const SizedBox(height: 8.0),
+                Container(
+                  height: 2.0,
+                  width: 50.0,
+                  color: Globals.redColor,
+                ),
+                const SizedBox(height: 8.0),
+                Text(
+                  'S./${widget.trip.price}',
+                  style: const TextStyle(fontSize: 16.0, color: Colors.white),
                 ),
               ],
             ),
@@ -699,18 +787,11 @@ class _TripDetailsScreenState extends State<TripDetailsScreen> {
         onPressed: () {
           // Lógica para comprar el viaje
         },
-        label: Text(
-          'S./${widget.trip.price}',
-          style: const TextStyle(
-            fontSize: 18.0,
-            fontWeight: FontWeight.bold,
-            color: Colors.white,
-          ),
-        ),
+        label: const Text(''),
         icon: const Icon(Icons.shopping_cart),
         backgroundColor: Colors.red,
       ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
     );
   }
 
