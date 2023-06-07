@@ -4,23 +4,29 @@ import 'package:frontend/screens/trips/filter_screen.dart';
 import 'package:frontend/screens/trips/trip_list_screen.dart';
 import 'package:frontend/shared/globals.dart';
 import 'package:frontend/widgets/app_bar.dart';
+import 'package:provider/provider.dart';
+
 
 class TripScreen extends StatefulWidget {
-  const TripScreen({Key? key,required this.auth}) : super(key: key);
-  final AuthenticationProvider auth;
+  const TripScreen({super.key});
 
   @override
-  // ignore: library_private_types_in_public_api
-  _TripScreenState createState() => _TripScreenState();
+  State<TripScreen> createState() {
+    return _TripScreenState();
+  }
 }
 
 class _TripScreenState extends State<TripScreen> {
   @override
   Widget build(BuildContext context) {
+    final authProvider = Provider.of<AuthenticationProvider>(
+      context,
+      listen: false,
+    );
 
     return Scaffold(
       backgroundColor: Globals.backgroundColor,
-      bottomNavigationBar: const AppBarBack(),
+      bottomNavigationBar: AppBarBack(),
       appBar: AppBar(
         title: const Text("Trips"),
         backgroundColor: Globals.redColor,
@@ -35,11 +41,12 @@ class _TripScreenState extends State<TripScreen> {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                    builder: (context) => FilterScreen(token: widget.auth.token)),
+                    builder: (context) =>
+                        FilterScreen(token: authProvider.token)),
               );
             },
           ),
-          TripListScreen(auth: widget.auth),
+          const TripListScreen(),
         ],
       ),
     );

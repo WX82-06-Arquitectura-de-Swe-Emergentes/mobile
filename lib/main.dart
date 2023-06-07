@@ -4,8 +4,10 @@ import 'package:frontend/providers/auth_provider.dart';
 import 'package:frontend/providers/destination_provider.dart';
 import 'package:frontend/providers/season_provider.dart';
 import 'package:frontend/providers/trip_provider.dart';
+import 'package:frontend/screens/chats/chat_list_screen.dart';
 import 'package:frontend/screens/login_screen.dart';
 import 'package:frontend/screens/register_screen.dart';
+import 'package:frontend/screens/trips/trip_screen.dart';
 import 'package:provider/provider.dart';
 
 Future<void> main() async {
@@ -31,6 +33,8 @@ Map<String, WidgetBuilder> _getRoutes() {
   return {
     '/signin': (context) => const LoginScreen(),
     '/signup': (context) => const RegisterScreen(),
+    '/trip': (context) => const TripScreen(),
+    '/chat':(context) => const ChatListScreen(),
   };
 }
 

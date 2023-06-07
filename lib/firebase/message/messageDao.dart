@@ -1,4 +1,3 @@
-
 import 'package:firebase_database/firebase_database.dart';
 import 'package:frontend/firebase/message/message.dart';
 
@@ -11,5 +10,4 @@ class MessageDao {
   }
 
   Query getMessageQuery() => _messageRef;
-
 }

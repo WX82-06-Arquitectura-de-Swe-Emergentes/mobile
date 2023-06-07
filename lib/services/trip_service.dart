@@ -1,3 +1,4 @@
+import 'package:frontend/models/review.dart';
 import 'package:frontend/models/trip.dart';
 import 'package:frontend/services/api_service.dart';
 
@@ -22,5 +23,15 @@ class TripService {
     final url = buildFilterUrl(filters);
     final response = await ApiService.get(url, headers);
     return (response as List).map((data) => Trip.fromJson(data)).toList();
+  }
+
+  Future<List<Review>> getTripReviews(String? token, int tripId) async {
+    Map<String, String> headers = {
+      'Authorization': 'Bearer $token'
+    };
+    String url = '/ratings?tripId=${tripId.toString()}';
+    final response = await ApiService.get(url, headers);
+      return 
+          (response as List).map((data) => Review.fromJson(data)).toList();
   }
 }

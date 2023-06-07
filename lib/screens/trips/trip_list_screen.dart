@@ -7,20 +7,21 @@ import 'package:frontend/shared/globals.dart';
 import 'package:provider/provider.dart';
 
 class TripListScreen extends StatefulWidget {
-  const TripListScreen({Key? key, required this.auth}) : super(key: key);
-  final AuthenticationProvider auth;
+  const TripListScreen({Key? key}) : super(key: key);
 
   @override
-  _TripListScreenState createState() => _TripListScreenState();
+  State<TripListScreen> createState() {
+    return _TripListScreenState();
+  }
 }
 
 class _TripListScreenState extends State<TripListScreen> {
   final isLoading = ValueNotifier<bool>(true);
-  final tripProvider = TripProvider();
 
   @override
   void initState() {
     super.initState();
+
     getData().then((value) {
       setState(() {
         isLoading.value = false;
@@ -28,19 +29,35 @@ class _TripListScreenState extends State<TripListScreen> {
     });
   }
 
-  Future getData() async {
+  Future<void> getData() async {
     final tripProvider = Provider.of<TripProvider>(
       context,
       listen: false,
     );
+    final authProvider = Provider.of<AuthenticationProvider>(
+      context,
+      listen: false,
+    );
     if (tripProvider.trips.isEmpty) {
-      await tripProvider.getTrips(widget.auth.token);
+      await tripProvider.getTrips(authProvider.token);
+    }
+  }
+
+    void setStateIfMounted(f) {
+    if (mounted) {
+      setState(() {
+        isLoading.value = f;
+      });
     }
   }
 
   @override
   Widget build(BuildContext context) {
     final tripProvider = Provider.of<TripProvider>(context, listen: true);
+    final authProvider = Provider.of<AuthenticationProvider>(
+      context,
+      listen: false,
+    );
     final trips = tripProvider.trips;
 
     return ValueListenableBuilder<bool>(
@@ -53,13 +70,9 @@ class _TripListScreenState extends State<TripListScreen> {
         } else {
           return RefreshIndicator(
             onRefresh: () async {
-              setState(() {
-                isLoading.value = true;
-              });
-              await getData();
-              setState(() {
-                isLoading.value = false;
-              });
+              setStateIfMounted(true);
+              await tripProvider.getTrips(authProvider.token);
+              setStateIfMounted(false);
             },
             child: trips.isEmpty
                 ? const Center(child: Text('No hay viajes disponibles'))
@@ -68,7 +81,7 @@ class _TripListScreenState extends State<TripListScreen> {
                     shrinkWrap: true,
                     padding: const EdgeInsets.all(16),
                     itemBuilder: (ct, i) =>
-                        TripCard(trip: trips[i], auth: widget.auth),
+                        TripCard(trip: trips[i], auth: authProvider),
                     separatorBuilder: (_, __) => const SizedBox(height: 16),
                     itemCount: trips.length,
                   ),

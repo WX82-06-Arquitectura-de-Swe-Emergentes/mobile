@@ -1,46 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/providers/auth_provider.dart';
-import 'package:frontend/screens/chats/chat_list_screen.dart';
-import 'package:frontend/screens/trips/trip_screen.dart';
 import 'package:frontend/shared/globals.dart';
 import 'package:provider/provider.dart';
 
-class AppBarBack extends StatefulWidget {
+class AppBarBack extends StatelessWidget implements PreferredSizeWidget {
   const AppBarBack({super.key});
 
   @override
-  State<AppBarBack> createState() => _AppBarBackState();
-}
-
-class _AppBarBackState extends State<AppBarBack> {
-  int index = 0;
-  @override
   Widget build(BuildContext context) {
     final auth = Provider.of<AuthenticationProvider>(context, listen: false);
+    final currentIndex = _getCurrentIndex(context);
 
     return BottomNavigationBar(
-      currentIndex: index,
+      currentIndex: currentIndex,
       onTap: (int i) {
-        setState(() {
-          if(i == 0){
-            Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) => TripScreen(auth: auth)),
-              );
-          }
-          else if (i == 1) {
-            Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) => ChatListScreen(auth: auth)),
-              );
-          }
-        });
+        _navigateToScreen(context, i, auth);
       },
       type: BottomNavigationBarType.fixed,
       backgroundColor: Globals.primaryColor,
-      selectedItemColor: index == 1 ? Colors.blue : Colors.blueGrey,
+      selectedItemColor: Globals.redColor,
       unselectedItemColor: Colors.blueGrey,
       iconSize: 25.0,
       selectedFontSize: 14.0,
@@ -65,4 +43,47 @@ class _AppBarBackState extends State<AppBarBack> {
       ],
     );
   }
+
+  // modify the method _getRoutes in main.dart to asscoiate the routes with the index
+  int _getCurrentIndex(BuildContext context) {
+    final routeName = ModalRoute.of(context)?.settings?.name;
+    switch (routeName) {
+      case '/trip':
+        return 0;
+      case '/chat':
+        return 1;
+      // case '/cart':
+      //   return 2;
+      // case '/profile':
+      //   return 3;
+      default:
+        return 0;
+    }
+  }
+
+  void _navigateToScreen(
+      BuildContext context, int index, AuthenticationProvider auth) {
+    final currentRoute = ModalRoute.of(context)?.settings?.name;
+    String newRoute = '';
+    switch (index) {
+      case 0:
+        newRoute = '/trip';
+        break;
+      case 1:
+        newRoute = '/chat';
+        break;
+      // case 2:
+      //   newRoute = '/cart';
+      //   break;
+      // case 3:
+      //   newRoute = '/profile';
+      //   break;
+    }
+    if (currentRoute != newRoute) {
+      Navigator.pushNamed(context, newRoute);
+    }
+  }
+
+  @override
+  Size get preferredSize => const Size.fromHeight(kToolbarHeight + 56.0);
 }

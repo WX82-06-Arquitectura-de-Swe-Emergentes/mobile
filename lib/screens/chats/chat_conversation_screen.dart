@@ -1,6 +1,5 @@
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
-import 'package:frontend/firebase/chat/chat.dart';
 import 'package:frontend/firebase/chat/chatDao.dart';
 import 'package:frontend/firebase/member/memberDao.dart';
 import 'package:frontend/firebase/message/message.dart';
@@ -14,12 +13,13 @@ class ChatConversationScreen extends StatefulWidget {
   const ChatConversationScreen(
       {Key? key, required this.chat, required this.auth})
       : super(key: key);
-  final Chat chat;
+  final dynamic chat;
   final AuthenticationProvider auth;
 
   @override
-  // ignore: library_private_types_in_public_api
-  _ChatConversationScreenState createState() => _ChatConversationScreenState();
+  State<ChatConversationScreen> createState() {
+    return _ChatConversationScreenState();
+  }
 }
 
 class _ChatConversationScreenState extends State<ChatConversationScreen> {
@@ -51,6 +51,28 @@ class _ChatConversationScreenState extends State<ChatConversationScreen> {
     });
   }
 
+  void sendMessage() {
+    final messageText = _textController.text.trim();
+    if (messageText.isNotEmpty) {
+      Message newMessage = Message(
+        name: widget.auth.username,
+        message: messageText,
+        timestamp: DateTime.now().millisecondsSinceEpoch,
+      );
+
+      messageDao.saveMessage(widget.chat.id, newMessage);
+      DatabaseReference chatRef =
+          FirebaseDatabase.instance.ref().child('chats');
+
+      chatRef.child(widget.chat.id).update({
+        "lastMessage": newMessage.message,
+        "timestamp": newMessage.timestamp,
+      });
+
+      _textController.clear();
+    }
+  }
+
   void setStateIfMounted(f) {
     if (mounted) {
       setState(() {
@@ -76,9 +98,8 @@ class _ChatConversationScreenState extends State<ChatConversationScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Globals.backgroundColor,
-      bottomNavigationBar: const AppBarBack(),
       appBar: AppBar(
-        title: Text("Travel Package - ${widget.chat.title}"),
+        title: Text("${widget.chat.title} chat"),
       ),
       body: Column(
         children: [
@@ -98,32 +119,61 @@ class _ChatConversationScreenState extends State<ChatConversationScreen> {
                       isMe ? MainAxisAlignment.end : MainAxisAlignment.start,
                   children: [
                     Container(
-                      padding: const EdgeInsets.symmetric(
-                        vertical: 10,
-                        horizontal: 16,
-                      ),
+                      padding: const EdgeInsets.fromLTRB(16, 10, 16, 10),
                       margin: const EdgeInsets.symmetric(
                         vertical: 8,
                         horizontal: 8,
                       ),
                       decoration: BoxDecoration(
-                        color: isMe ? Colors.grey[300] : Colors.blue[300],
-                        borderRadius: BorderRadius.circular(16),
+                        color: isMe ? Colors.blue[300] : Colors.grey[300],
+                        borderRadius: BorderRadius.only(
+                          topLeft: Radius.circular(isMe ? 5 : 20),
+                          topRight: Radius.circular(isMe ? 20 : 5),
+                          bottomLeft: const Radius.circular(20),
+                          bottomRight: const Radius.circular(20),
+                        ),
+                      ),
+                      constraints: const BoxConstraints(
+                        minWidth: 50,
+                        maxWidth: 200,
                       ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
-                            "${isMe ? 'Me' : name} - ${timestamp.toString()}",
-                            style: const TextStyle(
-                              fontWeight: FontWeight.bold,
+                          Row(
+                            children: [
+                              if (!isMe)
+                                const Icon(
+                                  Icons.account_circle,
+                                  size: 20,
+                                ),
+                              Text(
+                                isMe ? 'Me' : name,
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: isMe ? Colors.white : Colors.black,
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 5),
+                          Container(
+                            constraints: const BoxConstraints(
+                              maxWidth: 200,
+                            ),
+                            child: Text(
+                              messageText,
+                              style: TextStyle(
+                                color: isMe ? Colors.white : Colors.black,
+                              ),
                             ),
                           ),
-                          const SizedBox(height: 8),
+                          const SizedBox(height: 5),
                           Text(
-                            messageText,
-                            style: const TextStyle(
-                              fontSize: 16,
+                            timestamp,
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: isMe ? Colors.white : Colors.black,
                             ),
                           ),
                         ],
@@ -152,16 +202,7 @@ class _ChatConversationScreenState extends State<ChatConversationScreen> {
                 ),
                 IconButton(
                   onPressed: () {
-                    final messageText = _textController.text.trim();
-                    if (messageText.isNotEmpty) {
-                      Message message = Message(
-                        name: widget.auth.username,
-                        message: messageText,
-                        timestamp: DateTime.now().millisecondsSinceEpoch,
-                      );
-                      messageDao.saveMessage(widget.chat.id, message);
-                      _textController.clear();
-                    }
+                    sendMessage();
                   },
                   icon: const Icon(Icons.send),
                 ),

@@ -13,7 +13,9 @@ class FilterScreen extends StatefulWidget {
   final String? token;
 
   @override
-  _FilterScreenState createState() => _FilterScreenState();
+  State<FilterScreen> createState() {
+    return _FilterScreenState();
+  }
 }
 
 enum Character { group, private }
