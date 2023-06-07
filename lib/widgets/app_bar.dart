@@ -54,8 +54,8 @@ class AppBarBack extends StatelessWidget implements PreferredSizeWidget {
         return 1;
       // case '/cart':
       //   return 2;
-      // case '/profile':
-      //   return 3;
+      case '/profile':
+        return 3;
       default:
         return 0;
     }
@@ -75,9 +75,9 @@ class AppBarBack extends StatelessWidget implements PreferredSizeWidget {
       // case 2:
       //   newRoute = '/cart';
       //   break;
-      // case 3:
-      //   newRoute = '/profile';
-      //   break;
+      case 3:
+        newRoute = '/profile';
+        break;
     }
     if (currentRoute != newRoute) {
       Navigator.pushNamed(context, newRoute);
