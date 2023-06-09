@@ -29,12 +29,29 @@ class _ProfileScreenState extends State<ProfileScreen> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Container(
-                height: 400,
                 width: double.infinity,
                 //margin: const EdgeInsets.symmetric(horizontal: 10),
                 child: const Column(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
+                    Card(
+                      color: Color.fromARGB(255, 16, 20, 30),
+                      margin: EdgeInsets.only(top: 255),
+                      child: ListTile(
+                        leading: Icon(
+                          Icons.gpp_good_outlined,
+                          color: Colors.white,
+                        ),
+                        title: Text(
+                          'Seguridad y Privacidad',
+                          style: TextStyle(color: Colors.white),
+                        ),
+                        trailing: Icon(
+                          Icons.chevron_right,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
                     Card(
                       color: Color.fromARGB(255, 16, 20, 30),
                       child: ListTile(
@@ -51,6 +68,22 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           color: Colors.white,
                         ),
                       ),
+                    ),
+                    Card(
+                      color: Color.fromARGB(255, 16, 20, 30),
+                      child: ListTile(
+                          leading: Icon(
+                            Icons.help_outline_rounded,
+                            color: Colors.white,
+                          ),
+                          title: Text(
+                            'Help & Support',
+                            style: TextStyle(color: Colors.white),
+                          ),
+                          trailing: Icon(
+                            Icons.chevron_right,
+                            color: Colors.white,
+                          )),
                     ),
                     Card(
                       color: Color.fromARGB(255, 16, 20, 30),
