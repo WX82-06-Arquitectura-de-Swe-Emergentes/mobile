@@ -1,44 +1,42 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/shared/globals.dart';
 
 class SectionDisplayWidget extends StatelessWidget {
-  const SectionDisplayWidget({
-    super.key,
-    required this.title,
-    required this.content,
-  });
+  const SectionDisplayWidget(
+      {super.key, required this.title, required this.content, this.icon});
 
   final String title;
   final String content;
+  final IconData? icon;
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            title,
-            style: const TextStyle(
-              fontSize: 20.0,
-              fontWeight: FontWeight.bold,
-              color: Colors.white,
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Row(
+          children: [
+            if (icon != null)
+              Icon(
+                icon,
+                color: Colors.white,
+                size: 16.0,
+              ),
+            const SizedBox(width: 8),
+            Text(
+              title,
+              style: const TextStyle(
+                fontSize: 14.0,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+              ),
             ),
-          ),
-          const SizedBox(height: 8.0),
-          Container(
-            height: 2.0,
-            width: 50.0,
-            color: Globals.redColor,
-          ),
-          const SizedBox(height: 8.0),
-          Text(
-            content,
-            style: const TextStyle(fontSize: 16.0, color: Colors.white),
-          ),
-        ],
-      ),
+          ],
+        ),
+        Text(
+          content,
+          style: const TextStyle(fontSize: 14.0,fontWeight: FontWeight.w300, color: Colors.white),
+        ),
+      ],
     );
   }
 }

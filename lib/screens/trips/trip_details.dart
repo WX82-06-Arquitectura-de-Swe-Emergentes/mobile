@@ -9,10 +9,9 @@ import 'package:frontend/providers/auth_provider.dart';
 import 'package:frontend/services/trip_service.dart';
 import 'package:frontend/shared/globals.dart';
 import 'package:frontend/widgets/image_slider_widget.dart';
-import 'package:frontend/widgets/trip_details/bar_info_display.widget.dart';
-import 'package:frontend/widgets/trip_details/itinerary_view_widget.dart';
+import 'package:frontend/widgets/trip_details/my_itinerary_view_widget.dart';
+import 'package:frontend/widgets/trip_details/my_review_view_widget.dart';
 import 'package:frontend/widgets/trip_details/section_display.widget.dart';
-import 'package:frontend/widgets/trip_details/review_view_widget.dart';
 
 class TripDetailsScreen extends StatefulWidget {
   final Trip trip;
@@ -26,7 +25,6 @@ class TripDetailsScreen extends StatefulWidget {
     return _TripDetailsScreenState();
   }
 }
-
 class _TripDetailsScreenState extends State<TripDetailsScreen> {
   List<Review> reviews = [];
   bool showAllReviews = false;
@@ -112,63 +110,96 @@ class _TripDetailsScreenState extends State<TripDetailsScreen> {
   Widget build(BuildContext context) {
     final sortedItineraries = widget.trip.itineraries.toList()
       ..sort((a, b) => a.day.compareTo(b.day));
-    final visibleItineraries =
-        showAllItineraries ? sortedItineraries : sortedItineraries.take(1);
 
-    final sortedReviews = reviews.toList();
-    final visibleReviews =
-        showAllReviews ? sortedReviews : sortedReviews.take(3);
+    String formatPriceToPenTwoDecimals(double price) {
+      return 'S/ ${price.toStringAsFixed(2)}';
+    }
 
     return Scaffold(
       backgroundColor: Globals.backgroundColor,
       appBar: AppBar(
-        title: Text(
-          widget.trip.name,
-          style: const TextStyle(
+        title: const Text(
+          "Trip details",
+          style: TextStyle(
               fontSize: 24.0, fontWeight: FontWeight.bold, color: Colors.white),
         ),
         centerTitle: true,
         backgroundColor: Globals.redColor,
       ),
       body: SingleChildScrollView(
+          child: Padding(
+        padding: const EdgeInsets.all(16.0),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          BarInfoDisplayWidget(trip: widget.trip),
-          const SizedBox(height: 16.0),
           ImageSliderWidget(images: widget.trip.images),
           const SizedBox(height: 16.0),
-          Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0),
-              child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    ElevatedButton(
-                      onPressed: () {
-                        createChat();
-                      },
-                      child: const Icon(Icons.chat, color: Colors.white),
-                    )
-                  ])),
-          const SizedBox(height: 16.0),
+          Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+            Expanded(
+              flex: 1,
+              child: Text(widget.trip.name,
+                  style: const TextStyle(
+                      fontSize: 24.0,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white)),
+            ),
+            const SizedBox(width: 8),
+            Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              ElevatedButton(
+                  onPressed: () {
+                    createChat();
+                  },
+                  child: const Icon(Icons.chat, color: Colors.white))
+            ]),
+          ]),
+          const SizedBox(height: 24.0),
+          Row(
+            children: [
+              const Icon(
+                Icons.arrow_outward,
+                color: Colors.white,
+                size: 16.0,
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                flex: 1,
+                child: Text(
+                  widget.trip.description,
+                  style: const TextStyle(fontSize: 14.0, color: Colors.white),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 24.0),
           SectionDisplayWidget(
-              title: 'CATEGORY', content: widget.trip.category),
-          const SizedBox(height: 16.0),
-          SectionDisplayWidget(title: 'SEASON', content: widget.trip.season),
-          const SizedBox(height: 16.0),
+              title: 'DESTINATION',
+              content: widget.trip.destination.name,
+              icon: Icons.arrow_outward),
+          const SizedBox(
+              height: 24,
+              child: Divider(
+                color: Colors.white10,
+              )),
           SectionDisplayWidget(
-              title: 'DESCRIPTION', content: widget.trip.description),
-          const SizedBox(height: 16.0),
-          ItineraryViewWidget(
-              visibleItineraries: visibleItineraries,
-              sortedItineraries: sortedItineraries,
-              showAllItineraries: showAllItineraries),
-          const SizedBox(height: 16.0),
-          ReviewViewWidget(
-              sortedReviews: sortedReviews,
-              visibleReviews: visibleReviews,
-              showAllReviews: showAllReviews),
-          const SizedBox(height: 16.0),
+              title: 'CATEGORY',
+              content: widget.trip.category,
+              icon: Icons.arrow_outward),
+          const SizedBox(
+              height: 24,
+              child: Divider(
+                color: Colors.white10,
+              )),
+          SectionDisplayWidget(
+              title: 'SEASON',
+              content: widget.trip.season,
+              icon: Icons.arrow_outward),
+          const SizedBox(height: 24.0),
+          MyItineraryViewWidget(
+            itineraries: sortedItineraries,
+          ),
+          const SizedBox(height: 24.0),
+          MyReviewViewWidget(reviews: reviews),
+          const SizedBox(height: 24.0),
         ]),
-      ),
+      )),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () {
           // Lógica para comprar el viaje
@@ -178,7 +209,8 @@ class _TripDetailsScreenState extends State<TripDetailsScreen> {
           children: [
             const Icon(Icons.shopping_cart),
             const SizedBox(width: 12),
-            Text('S./${widget.trip.price}', style: TextStyle(fontSize: 16)),
+            Text(formatPriceToPenTwoDecimals(widget.trip.price),
+                style: const TextStyle(fontSize: 16)),
           ],
         ),
         backgroundColor: Colors.red,
@@ -186,6 +218,4 @@ class _TripDetailsScreenState extends State<TripDetailsScreen> {
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
     );
   }
-
-  final PageController _pageController = PageController();
 }

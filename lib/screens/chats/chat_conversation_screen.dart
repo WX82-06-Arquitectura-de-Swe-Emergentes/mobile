@@ -125,7 +125,7 @@ class _ChatConversationScreenState extends State<ChatConversationScreen> {
                         horizontal: 8,
                       ),
                       decoration: BoxDecoration(
-                        color: isMe ? Colors.blue[300] : Colors.grey[300],
+                        color: isMe ? Globals.primaryColor : Colors.grey[300],
                         borderRadius: BorderRadius.only(
                           topLeft: Radius.circular(isMe ? 5 : 20),
                           topRight: Radius.circular(isMe ? 20 : 5),
