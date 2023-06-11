@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/screens/profile/privacyPolicy_screen.dart';
+import 'package:frontend/screens/profile/setting_screen.dart';
+import 'package:frontend/screens/profile/support_screen.dart';
 import 'package:frontend/shared/globals.dart';
 import 'package:frontend/widgets/app_bar.dart';
 
@@ -28,79 +31,112 @@ class _ProfileScreenState extends State<ProfileScreen> {
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Container(
+              SizedBox(
                 width: double.infinity,
                 //margin: const EdgeInsets.symmetric(horizontal: 10),
-                child: const Column(
+                child: Column(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
-                    Card(
-                      color: Color.fromARGB(255, 16, 20, 30),
-                      margin: EdgeInsets.only(top: 255),
-                      child: ListTile(
-                        leading: Icon(
-                          Icons.gpp_good_outlined,
-                          color: Colors.white,
-                        ),
-                        title: Text(
-                          'Seguridad y Privacidad',
-                          style: TextStyle(color: Colors.white),
-                        ),
-                        trailing: Icon(
-                          Icons.chevron_right,
-                          color: Colors.white,
-                        ),
-                      ),
-                    ),
-                    Card(
-                      color: Color.fromARGB(255, 16, 20, 30),
-                      child: ListTile(
-                        leading: Icon(
-                          Icons.settings,
-                          color: Colors.white,
-                        ),
-                        title: Text(
-                          'Configuración de la cuenta',
-                          style: TextStyle(color: Colors.white),
-                        ),
-                        trailing: Icon(
-                          Icons.chevron_right,
-                          color: Colors.white,
-                        ),
-                      ),
-                    ),
-                    Card(
-                      color: Color.fromARGB(255, 16, 20, 30),
-                      child: ListTile(
+                    GestureDetector(
+                      child: const Card(
+                        color: Color.fromARGB(255, 16, 20, 30),
+                        margin: EdgeInsets.only(top: 255),
+                        child: ListTile(
                           leading: Icon(
-                            Icons.help_outline_rounded,
+                            Icons.gpp_good_outlined,
                             color: Colors.white,
                           ),
                           title: Text(
-                            'Help & Support',
+                            'Privacy Policy',
                             style: TextStyle(color: Colors.white),
                           ),
                           trailing: Icon(
                             Icons.chevron_right,
                             color: Colors.white,
-                          )),
-                    ),
-                    Card(
-                      color: Color.fromARGB(255, 16, 20, 30),
-                      child: ListTile(
-                        leading: Icon(
-                          Icons.logout,
-                          color: Colors.white,
-                        ),
-                        title: Text(
-                          'Cerrar Sesión',
-                          style: TextStyle(color: Colors.white),
-                        ),
-                        trailing: Icon(
-                          Icons.chevron_right,
-                          color: Colors.white,
+                          ),
                         ),
                       ),
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) =>
+                                  const PrivacyPolicyScreen()),
+                        );
+                      },
+                    ),
+                    GestureDetector(
+                      child: const Card(
+                        color: Color.fromARGB(255, 16, 20, 30),
+                        child: ListTile(
+                          leading: Icon(
+                            Icons.settings,
+                            color: Colors.white,
+                          ),
+                          title: Text(
+                            'Account settings',
+                            style: TextStyle(color: Colors.white),
+                          ),
+                          trailing: Icon(
+                            Icons.chevron_right,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const SettingScreen()),
+                        );
+                      },
+                    ),
+                    GestureDetector(
+                      child: const Card(
+                        color: Color.fromARGB(255, 16, 20, 30),
+                        child: ListTile(
+                            leading: Icon(
+                              Icons.help_outline_rounded,
+                              color: Colors.white,
+                            ),
+                            title: Text(
+                              'Help & Support',
+                              style: TextStyle(color: Colors.white),
+                            ),
+                            trailing: Icon(
+                              Icons.chevron_right,
+                              color: Colors.white,
+                            )),
+                      ),
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const SupportScreen()),
+                        );
+                      },
+                    ),
+                    GestureDetector(
+                      child: const Card(
+                        color: Color.fromARGB(255, 16, 20, 30),
+                        child: ListTile(
+                          leading: Icon(
+                            Icons.logout,
+                            color: Colors.white,
+                          ),
+                          title: Text(
+                            'Logout',
+                            style: TextStyle(color: Colors.white),
+                          ),
+                          trailing: Icon(
+                            Icons.chevron_right,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                      onTap: () {
+                        Navigator.pushNamed(context, '/signin');
+                      },
                     ),
                   ],
                 ),
@@ -108,7 +144,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ],
           ),
           CustomPaint(
-            painter: HeaderCurvedContainer(),
+            //painter: HeaderCurvedContainer(),
             child: SizedBox(
               width: MediaQuery.of(context).size.width,
               height: MediaQuery.of(context).size.height,
