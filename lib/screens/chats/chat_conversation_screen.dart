@@ -1,18 +1,21 @@
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
-import 'package:frontend/firebase/chat/chatDao.dart';
-import 'package:frontend/firebase/member/memberDao.dart';
+import 'package:frontend/firebase/chat/chat_dao.dart';
+import 'package:frontend/firebase/member/member_dao.dart';
 import 'package:frontend/firebase/message/message.dart';
-import 'package:frontend/firebase/message/messageDao.dart';
+import 'package:frontend/firebase/message/message_dao.dart';
+import 'package:frontend/firebase/notification/push_notification_request.dart';
+import 'package:frontend/firebase/notification/push_notifications_service.dart';
 import 'package:frontend/providers/auth_provider.dart';
 import 'package:frontend/shared/globals.dart';
-import 'package:frontend/widgets/app_bar.dart';
 import 'package:intl/intl.dart';
 
 class ChatConversationScreen extends StatefulWidget {
-  const ChatConversationScreen(
-      {Key? key, required this.chat, required this.auth})
-      : super(key: key);
+  const ChatConversationScreen({
+    Key? key,
+    required this.chat,
+    required this.auth,
+  }) : super(key: key);
   final dynamic chat;
   final AuthenticationProvider auth;
 
@@ -28,9 +31,17 @@ class _ChatConversationScreenState extends State<ChatConversationScreen> {
   final chatDao = ChatDao();
   final memberDao = MemberDao();
   final messageDao = MessageDao();
-  late dynamic messages;
+  late List<dynamic> messages;
 
-  Future<void> _loadMessagesFromChat() async {
+  void setStateIfMounted(f) {
+    if (mounted) {
+      setState(() {
+        messages = f;
+      });
+    }
+  }
+
+  void _loadMessagesFromChat() async {
     Query query = FirebaseDatabase.instance
         .ref()
         .child('messages')
@@ -40,7 +51,6 @@ class _ChatConversationScreenState extends State<ChatConversationScreen> {
       final json = event.snapshot.value as Map<dynamic, dynamic>;
 
       var _messages = {};
-      dynamic sortedMessages;
       if (json.containsKey(widget.chat.id)) {
         _messages = json[widget.chat.id] as Map<dynamic, dynamic>;
         setStateIfMounted(_messages.values.toList()
@@ -51,7 +61,37 @@ class _ChatConversationScreenState extends State<ChatConversationScreen> {
     });
   }
 
-  void sendMessage() {
+  Future<String> _findReceptor(String chatId) async {
+    final emisor = widget.auth.username;
+    final memberQuery = memberDao.getMemberRef().child(chatId);
+    final memberSnapshot = await memberQuery.once();
+    final json = memberSnapshot.snapshot.value as Map<dynamic, dynamic>;
+    final receptor = json.keys.toList().firstWhere((key) => key != emisor);
+    return receptor;
+  }
+
+  void _sendNotificationToReceptor() async {
+    final CustomNotification customNotification = CustomNotification(
+      title: 'New message',
+      body: 'You have a new message',
+    );
+    final String to = await _findReceptor(widget.chat.id);
+    final PushNotificationRequest request = PushNotificationRequest(
+      notification: customNotification,
+      data: null,
+      to: to,
+    );
+
+    Map<String, dynamic> payload = {
+      "notification": request.notification.toJson(),
+      "data": null,
+      "to": to,
+    };
+
+    await PushNotificationService.sendNotification(payload);
+  }
+
+  void _sendMessage() async {
     final messageText = _textController.text.trim();
     if (messageText.isNotEmpty) {
       Message newMessage = Message(
@@ -70,14 +110,6 @@ class _ChatConversationScreenState extends State<ChatConversationScreen> {
       });
 
       _textController.clear();
-    }
-  }
-
-  void setStateIfMounted(f) {
-    if (mounted) {
-      setState(() {
-        messages = f;
-      });
     }
   }
 
@@ -107,7 +139,7 @@ class _ChatConversationScreenState extends State<ChatConversationScreen> {
             child: ListView.builder(
               itemCount: messages.length,
               itemBuilder: (BuildContext context, int index) {
-                final messageData = messages[index];
+                final messageData = messages[index] as Map<dynamic, dynamic>;
                 final name = messageData['name'] as String;
                 final messageText = messageData['message'] as String;
                 final timestamp =
@@ -202,7 +234,8 @@ class _ChatConversationScreenState extends State<ChatConversationScreen> {
                 ),
                 IconButton(
                   onPressed: () {
-                    sendMessage();
+                    _sendMessage();
+                    _sendNotificationToReceptor();
                   },
                   icon: const Icon(Icons.send),
                 ),

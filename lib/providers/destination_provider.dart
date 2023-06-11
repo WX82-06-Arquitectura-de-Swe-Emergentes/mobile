@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/models/trip.dart';
+import 'package:frontend/models/destination.dart';
 import 'package:frontend/services/destination.service.dart';
 
 class DestinationProvider extends ChangeNotifier {

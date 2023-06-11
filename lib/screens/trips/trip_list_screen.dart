@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:frontend/models/trip.dart';
 import 'package:frontend/providers/auth_provider.dart';
@@ -63,6 +61,14 @@ class _TripListScreenState extends State<TripListScreen> {
     );
     final trips = tripProvider.trips;
 
+    double responsiveValue(double min, double max, int defaultValue) {
+      if (MediaQuery.of(context).size.width < defaultValue) {
+        return min;
+      } else {
+        return max;
+      }
+    }
+
     return ValueListenableBuilder<bool>(
       valueListenable: isLoading,
       builder: (ct, value, _) {
@@ -78,14 +84,17 @@ class _TripListScreenState extends State<TripListScreen> {
               setStateIfMounted(false);
             },
             child: trips.isEmpty
-                ? const Center(child: Text('No hay viajes disponibles'))
+                ? const Center(
+                    child: Text('No hay viajes disponibles',
+                        style: TextStyle(color: Colors.white)))
                 : ListView.separated(
                     scrollDirection: Axis.vertical,
                     shrinkWrap: true,
-                    padding: const EdgeInsets.all(16),
+                    padding: EdgeInsets.all(responsiveValue(8.0, 16.0, 400)),
                     itemBuilder: (ct, i) =>
                         TripCard(trip: trips[i], auth: authProvider),
-                    separatorBuilder: (_, __) => const SizedBox(height: 16),
+                    separatorBuilder: (_, __) =>
+                        SizedBox(height: responsiveValue(8.0, 16.0, 400)),
                     itemCount: trips.length,
                   ),
           );
@@ -103,25 +112,33 @@ class TripCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final difference = trip.endDate.difference(trip.startDate);
-    final deviceImageWidth =
-        MediaQuery.of(context).size.width < 400 ? 60.0 : 100.0;
-    final deviceImageHeight =
-        MediaQuery.of(context).size.height < 400 ? 60.0 : 100.0;
+    String formatPriceToPenTwoDecimals(double price) {
+      if (price % 1 == 0) {
+        return 'S/ ${price.toInt()}';
+      } else {
+        return 'S/ ${price.toStringAsFixed(2)}';
+      }
+    }
 
-        String formatPriceToPenTwoDecimals(double price) {
-      return 'S/ ${price.toStringAsFixed(2)}';
+    double responsiveValue(double min, double max, int defaultValue) {
+      if (MediaQuery.of(context).size.width < defaultValue) {
+        return min;
+      } else {
+        return max;
+      }
     }
 
     return InkWell(
       onTap: () async {
-        await Future.delayed(Duration.zero);
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => TripDetailsScreen(trip: trip, auth: auth),
-          ),
-        );
+        await Future.delayed(Duration.zero, () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) =>
+                  TripDetailsScreen(tripId: trip.id, auth: auth),
+            ),
+          );
+        });
       },
       child: Card(
         color: Globals.primaryColor,
@@ -132,72 +149,86 @@ class TripCard extends StatelessWidget {
               Row(
                 children: [
                   ClipRRect(
-                    borderRadius: BorderRadius.circular(10),
-                    child: Image.network(
-                      trip.images[0],
-                      width: deviceImageWidth,
-                      height: deviceImageHeight,
-                      fit: BoxFit.cover,
-                    ),
-                  ),
+                      borderRadius: BorderRadius.circular(10),
+                      child: FadeInImage.assetNetwork(
+                          placeholder: 'images/loading.gif',
+                          width: responsiveValue(80.0, 100.0, 400),
+                          height: responsiveValue(100.0, 120.0, 400),
+                          image: trip.thumbnail)),
                   const SizedBox(width: 16.0),
                   Expanded(
                       child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(trip.name,
-                          style: const TextStyle(
+                          style: TextStyle(
                               color: Colors.white,
-                              fontSize: 16.0,
+                              fontSize: responsiveValue(14.0, 16.0, 400),
                               fontWeight: FontWeight.bold)),
                       const SizedBox(height: 8.0),
-                      Text(trip.destination.name,
-                          style: const TextStyle(
-                              color: Colors.white, fontSize: 12.0)),
+                      Text(trip.destinationName,
+                          style: TextStyle(
+                              color: Colors.white,
+                              fontSize: responsiveValue(10.0, 12.0, 400))),
                     ],
                   ))
                 ],
               ),
-              const SizedBox(
-                  height: 24,
-                  child: Divider(
+              SizedBox(
+                  height: responsiveValue(12.0, 24.0, 400),
+                  child: const Divider(
                     color: Colors.white10,
                   )),
               Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text("Rating",
-                          style: TextStyle(color: Colors.white)),
-                      const SizedBox(height: 8.0),
+                      Text("Rating",
+                          style: TextStyle(
+                              color: Colors.white,
+                              fontSize: responsiveValue(12.0, 14.0, 400))),
+                      SizedBox(width: responsiveValue(4.0, 8.0, 400)),
                       Row(
                         children: [
-                          const Icon(Icons.star, color: Colors.yellow),
-                          const SizedBox(width: 8.0),
-                          Text('${Random().nextInt(5)}/5',
-                              style: const TextStyle(color: Colors.white)),
+                          Icon(Icons.star,
+                              color: Colors.yellow,
+                              size: responsiveValue(16.0, 20.0, 400)),
+                          SizedBox(width: responsiveValue(2.0, 8.0, 400)),
+                          Text('${trip.averageRating}/5',
+                              style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: responsiveValue(12.0, 14.0, 400))),
                         ],
                       ),
                     ],
                   ),
+                  const Spacer(flex: 1),
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text("Price",
-                          style: TextStyle(color: Colors.white)),
-                      const SizedBox(height: 8.0),
+                      Text("Price",
+                          style: TextStyle(
+                              color: Colors.white,
+                              fontSize: responsiveValue(12.0, 14.0, 400))),
+                      SizedBox(width: responsiveValue(4.0, 8.0, 400)),
                       Text(formatPriceToPenTwoDecimals(trip.price),
-                          style: const TextStyle(color: Colors.white)),
+                          style: TextStyle(
+                              color: Colors.white,
+                              fontSize: responsiveValue(12.0, 14.0, 400))),
                     ],
                   ),
+                  const Spacer(flex: 1),
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text("Status",
-                          style: TextStyle(color: Colors.white)),
-                      const SizedBox(height: 8.0),
+                      Text("Status",
+                          style: TextStyle(
+                              color: Colors.white,
+                              fontSize: responsiveValue(12.0, 14.0, 400))),
+                      SizedBox(width: responsiveValue(4.0, 8.0, 400)),
                       Row(
                         children: [
                           Container(
@@ -210,21 +241,29 @@ class TripCard extends StatelessWidget {
                               shape: BoxShape.circle,
                             ),
                           ),
-                          const SizedBox(width: 8.0),
+                          SizedBox(width: responsiveValue(2.0, 8.0, 400)),
                           Text(trip.status == 'A' ? 'Open' : 'Closed',
-                              style: const TextStyle(color: Colors.white)),
+                              style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: responsiveValue(12.0, 14.0, 400))),
                         ],
                       ),
                     ],
                   ),
+                  const Spacer(flex: 1),
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text("Date", style: TextStyle(color: Colors.white)),
-                      const SizedBox(height: 8.0),
+                      Text("Date",
+                          style: TextStyle(
+                              color: Colors.white,
+                              fontSize: responsiveValue(12.0, 14.0, 400))),
+                      SizedBox(width: responsiveValue(4.0, 8.0, 400)),
                       Text(
                           '${DateFormat('dd/MM').format(trip.startDate)} - ${DateFormat('dd/MM').format(trip.endDate)}',
-                          style: const TextStyle(color: Colors.white)),
+                          style: TextStyle(
+                              color: Colors.white,
+                              fontSize: responsiveValue(12.0, 14.0, 400))),
                     ],
                   ),
                 ],

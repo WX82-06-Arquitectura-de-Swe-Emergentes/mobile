@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:dropdown_search/dropdown_search.dart';
+import 'package:frontend/models/destination.dart';
+import 'package:frontend/models/filter.dart';
 import 'package:frontend/models/season.dart';
-import 'package:frontend/models/trip.dart';
 import 'package:frontend/providers/auth_provider.dart';
 import 'package:frontend/providers/destination_provider.dart';
 import 'package:frontend/providers/season_provider.dart';
@@ -18,10 +19,7 @@ class FilterScreen extends StatefulWidget {
   }
 }
 
-enum Character { group, private }
-
 class _FilterScreenState extends State<FilterScreen> {
-  Character? _character = Character.group;
   double _currentSliderValue = 1000;
   final double _currentSliderValue1 = 1;
   String? _selectedDestination;
