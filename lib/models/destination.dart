@@ -5,24 +5,24 @@ Destination destinationFromJson(String str) => Destination.fromJson(json.decode(
 String destinationToJson(Destination data) => json.encode(data.toJson());
 
 class Destination {
-    int destinationId;
+    int id;
     String name;
     String description;
 
     Destination({
-        required this.destinationId,
+        required this.id,
         required this.name,
         required this.description,
     });
 
     factory Destination.fromJson(Map<String, dynamic> json) => Destination(
-        destinationId: json["destination_id"],
+        id: json["id"],
         name: json["name"],
         description: json["description"],
     );
 
     Map<String, dynamic> toJson() => {
-        "destination_id": destinationId,
+        "id": id,
         "name": name,
         "description": description,
     };

@@ -13,10 +13,10 @@ class MyReviewViewWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        Row(mainAxisAlignment: MainAxisAlignment.start, children: const [
+        Row(mainAxisAlignment: MainAxisAlignment.start, children:  [
           Text(
-            'Reviews',
-            style: TextStyle(
+            'Reviews (${reviews.length})',
+            style: const TextStyle(
               fontSize: 24,
               fontWeight: FontWeight.bold,
               color: Colors.white,
@@ -24,7 +24,7 @@ class MyReviewViewWidget extends StatelessWidget {
           )
         ]),
         const SizedBox(height: 16),
-        reviews.length > 0 ?
+        reviews.isNotEmpty ?
         SizedBox(
           height: 200,
           child: ListView.builder(

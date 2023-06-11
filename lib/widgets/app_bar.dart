@@ -46,7 +46,7 @@ class AppBarBack extends StatelessWidget implements PreferredSizeWidget {
 
   // modify the method _getRoutes in main.dart to asscoiate the routes with the index
   int _getCurrentIndex(BuildContext context) {
-    final routeName = ModalRoute.of(context)?.settings?.name;
+    final routeName = ModalRoute.of(context)?.settings.name;
     switch (routeName) {
       case '/trip':
         return 0;
@@ -63,7 +63,7 @@ class AppBarBack extends StatelessWidget implements PreferredSizeWidget {
 
   void _navigateToScreen(
       BuildContext context, int index, AuthenticationProvider auth) {
-    final currentRoute = ModalRoute.of(context)?.settings?.name;
+    final currentRoute = ModalRoute.of(context)?.settings.name;
     String newRoute = '';
     switch (index) {
       case 0:

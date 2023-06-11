@@ -16,4 +16,12 @@ class AuthenticationService {
 
     return await ApiService.post(endpoint, headers, body);
   }
+
+  Future<dynamic> updateUser(String email, String mobileToken) async {
+    final endpoint = '/auth/user?email=$email';
+    final headers = {'Content-Type': 'application/json'};
+    final body = {"mobile_token": mobileToken};
+
+    return await ApiService.patch(endpoint, headers, body);
+  }
 }

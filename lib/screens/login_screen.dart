@@ -1,6 +1,6 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:frontend/screens/trips/trip_screen.dart';
+import 'package:frontend/firebase/notification/push_notifications_service.dart';
 import 'package:frontend/shared/globals.dart';
 import 'package:provider/provider.dart';
 import 'package:frontend/providers/auth_provider.dart';
@@ -29,12 +29,18 @@ class _LoginScreenState extends State<LoginScreen> {
 
     final auth = Provider.of<AuthenticationProvider>(context, listen: false);
 
+    // final email = "patrick@gmail.com" ?? _emailController.text;
+    // final password = "admin123" ?? _passwordController.text;
     final email = _emailController.text;
     final password = _passwordController.text;
 
     try {
-      // ignore: use_build_context_synchronously
       await auth.signIn(email, password);
+
+      if (PushNotificationService.tokenValue != '') {
+        await auth.updateUser(email, PushNotificationService.tokenValue);
+      }
+
       Future.delayed(Duration.zero, () {
         Navigator.of(context).pushReplacementNamed('/trip');
       });
