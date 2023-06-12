@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/screens/profile/account_setting_screen.dart';
 import 'package:frontend/screens/profile/privacyPolicy_screen.dart';
-import 'package:frontend/screens/profile/setting_screen.dart';
+import 'package:frontend/screens/profile/notification_screen.dart';
 import 'package:frontend/screens/profile/support_screen.dart';
 import 'package:frontend/shared/globals.dart';
 import 'package:frontend/widgets/app_bar.dart';
@@ -40,7 +41,34 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     GestureDetector(
                       child: const Card(
                         color: Color.fromARGB(255, 16, 20, 30),
-                        margin: EdgeInsets.only(top: 255),
+                        margin: EdgeInsets.only(top: 220),
+                        child: ListTile(
+                          leading: Icon(
+                            Icons.settings,
+                            color: Colors.white,
+                          ),
+                          title: Text(
+                            'Account settings',
+                            style: TextStyle(color: Colors.white),
+                          ),
+                          trailing: Icon(
+                            Icons.chevron_right,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) =>
+                                  const AccountSettingScreen()),
+                        );
+                      },
+                    ),
+                    GestureDetector(
+                      child: const Card(
+                        color: Color.fromARGB(255, 16, 20, 30),
                         child: ListTile(
                           leading: Icon(
                             Icons.gpp_good_outlined,
@@ -70,11 +98,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         color: Color.fromARGB(255, 16, 20, 30),
                         child: ListTile(
                           leading: Icon(
-                            Icons.settings,
+                            Icons.notifications,
                             color: Colors.white,
                           ),
                           title: Text(
-                            'Account settings',
+                            'Notification',
                             style: TextStyle(color: Colors.white),
                           ),
                           trailing: Icon(
@@ -87,7 +115,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: (context) => const SettingScreen()),
+                              builder: (context) => const NotificationScreen()),
                         );
                       },
                     ),
@@ -158,8 +186,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ),
               Container(
                 padding: const EdgeInsets.all(10.0),
-                width: MediaQuery.of(context).size.width / 2,
-                height: MediaQuery.of(context).size.width / 2,
+                width: MediaQuery.of(context).size.width / 3,
+                height: MediaQuery.of(context).size.width / 3,
                 decoration: BoxDecoration(
                   border: Border.all(color: Colors.white, width: 5),
                   shape: BoxShape.circle,
@@ -173,7 +201,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ],
           ),
           Padding(
-            padding: const EdgeInsets.only(bottom: 270, left: 184),
+            padding: const EdgeInsets.only(bottom: 270, left: 120),
             child: CircleAvatar(
               backgroundColor: Colors.black54,
               child: IconButton(
