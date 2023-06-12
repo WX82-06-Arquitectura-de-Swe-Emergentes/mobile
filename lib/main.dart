@@ -1,5 +1,5 @@
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:frontend/firebase/notification/push_notifications_service.dart';
 import 'package:frontend/providers/auth_provider.dart';
 import 'package:frontend/providers/destination_provider.dart';
 import 'package:frontend/providers/season_provider.dart';
@@ -13,7 +13,7 @@ import 'package:provider/provider.dart';
 Future<void> main() async {
 
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp();
+  PushNotificationService.initializeApp();
 
   runApp(MultiProvider(
     providers: [
@@ -38,10 +38,29 @@ Map<String, WidgetBuilder> _getRoutes() {
   };
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+class MyApp extends StatefulWidget {
+  const MyApp({super.key, state});
 
-  // This widget is the root of your application.
+  @override
+  State<MyApp> createState() {
+    return _MyAppState();
+  }
+}
+
+class _MyAppState extends State<MyApp> {
+
+  @override
+  void initState() {
+    super.initState();
+    
+    // Tenemos acceso al context
+    PushNotificationService.messagesStream.listen((message) {
+      print("Message $message");
+
+      // Navigator.of(context).pushNamed('/chat', arguments: event);
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(

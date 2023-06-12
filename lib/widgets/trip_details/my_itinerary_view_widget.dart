@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/models/trip.dart';
+import 'package:frontend/models/trip_item.dart';
 import 'package:frontend/shared/globals.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
@@ -10,6 +10,8 @@ class MyItineraryViewWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final sortedItineraries = itineraries.toList()..sort((a, b) => a.day.compareTo(b.day));
+
     return Column(
       children: [
         Row(mainAxisAlignment: MainAxisAlignment.start, children: const [
@@ -27,9 +29,9 @@ class MyItineraryViewWidget extends StatelessWidget {
           height: 250,
           child: ListView.builder(
             scrollDirection: Axis.horizontal,
-            itemCount: itineraries.length,
+            itemCount: sortedItineraries.length,
             itemBuilder: (context, index) {
-              return ItineraryItem(itinerary: itineraries[index]);
+              return ItineraryItem(itinerary: sortedItineraries[index]);
             },
           ),
         ),
@@ -98,17 +100,28 @@ class ItineraryItem extends StatelessWidget {
                               color: Colors.white,
                               size: 16.0,
                             ),
-                            const SizedBox(width: 8),
+                            const SizedBox(width: 12),
                             Expanded(
-                              flex: 1,
-                              child: Text(
-                                itinerary.activities[index],
-                                style: const TextStyle(
-                                  fontSize: 14.0,
-                                  color: Colors.white,
-                                ),
-                              ),
-                            )
+                                flex: 1,
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      itinerary.activities[index].name,
+                                      style: const TextStyle(
+                                        fontSize: 14.0,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                    Text(
+                                      itinerary.activities[index].description,
+                                      style: const TextStyle(
+                                        fontSize: 12.0,
+                                        color: Colors.grey,
+                                      ),
+                                    ),
+                                  ],
+                                ))
                           ],
                         ),
                       );

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/models/filter.dart';
 
 import '../models/trip.dart';
 import '../services/trip_service.dart';

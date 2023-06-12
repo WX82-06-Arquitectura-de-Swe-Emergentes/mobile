@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/firebase/chat/chat.dart';
-import 'package:frontend/firebase/chat/chatDao.dart';
-import 'package:frontend/firebase/member/memberDao.dart';
+import 'package:frontend/firebase/chat/chat_dao.dart';
+import 'package:frontend/firebase/member/member_dao.dart';
 import 'package:frontend/providers/auth_provider.dart';
 import 'package:frontend/screens/chats/chat_conversation_screen.dart';
 import 'package:frontend/shared/globals.dart';
@@ -22,10 +22,16 @@ class _ChatListScreenState extends State<ChatListScreen> {
   final chatDao = ChatDao();
   final memberDao = MemberDao();
   late List<Map<dynamic, dynamic>> chats;
+  late AuthenticationProvider authProvider;
+  bool _isLoading = false;
 
   @override
   void initState() {
     super.initState();
+    authProvider = Provider.of<AuthenticationProvider>(
+      context,
+      listen: false,
+    );
     chats = [];
     _loadChatsForMember();
   }
@@ -60,10 +66,6 @@ class _ChatListScreenState extends State<ChatListScreen> {
   // }
 
   Future<void> _loadChatsForMember() async {
-     final authProvider = Provider.of<AuthenticationProvider>(
-      context,
-      listen: false,
-    );
     final _chats = <Map<dynamic, dynamic>>[];
     final memberQuery = memberDao
         .getMemberQuery()
@@ -91,6 +93,10 @@ class _ChatListScreenState extends State<ChatListScreen> {
     for (final chat in chats) {
       _listenForChatUpdates(chat['id']);
     }
+
+    setState(() {
+      _isLoading = false;
+    });
   }
 
   void _listenForChatUpdates(String chatId) {
@@ -115,7 +121,7 @@ class _ChatListScreenState extends State<ChatListScreen> {
 
   @override
   Widget build(BuildContext context) {
-     final authProvider = Provider.of<AuthenticationProvider>(
+    final authProvider = Provider.of<AuthenticationProvider>(
       context,
       listen: false,
     );
@@ -128,24 +134,26 @@ class _ChatListScreenState extends State<ChatListScreen> {
       ),
       body: Column(
         children: [
-          if (chats.isEmpty)
-            Column(
-              children: [
-                SizedBox(height: MediaQuery.of(context).size.height * 0.8),
-                const Center(
-                  child: Text(
-                    'No chats yet',
-                    style: TextStyle(fontSize: 18.0, color: Colors.white),
-                  ),
-                )
-              ],
-            )
+          if (_isLoading)
+            const Expanded(
+                child: Center(
+              child: CircularProgressIndicator(),
+            ))
+          else if (chats.isEmpty)
+            const Expanded(
+                child: Center(
+              child: Text(
+                'No chats yet',
+                style: TextStyle(fontSize: 18.0, color: Colors.white),
+              ),
+            ))
           else
             Expanded(
               child: ListView.builder(
                 itemCount: chats.length,
                 itemBuilder: (BuildContext context, int index) {
                   final conversation = chats[index];
+
                   return ListTile(
                     title: Text(
                       conversation['title'],

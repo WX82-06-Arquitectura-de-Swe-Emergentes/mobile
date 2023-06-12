@@ -32,10 +32,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
     final password = _passwordController.text;
 
     try {
-      // ignore: use_build_context_synchronously
       await auth.signUp(email, password);
-      // ignore: use_build_context_synchronously
-      Navigator.of(context).pushReplacementNamed('/trip');
+
+      Future.delayed(Duration.zero, () {
+        Navigator.of(context).pushReplacementNamed('/login');
+      });
     } on ApiException catch (e) {
       if (e.message != '') {
         // Si el login falla, muestra un mensaje de error
@@ -76,20 +77,27 @@ class _RegisterScreenState extends State<RegisterScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       backgroundColor: Globals.primaryColor,
       body: Padding(
-        padding: const EdgeInsets.all(64.0),
+        padding: EdgeInsets.fromLTRB(
+            MediaQuery.of(context).size.width < 400 ? 32.0 : 64.0,
+            0.0,
+            MediaQuery.of(context).size.width < 400 ? 32.0 : 64.0,
+            32.0),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
             Padding(
-              padding: const EdgeInsets.only(bottom: 32.0),
+              padding: EdgeInsets.only(
+                  bottom:
+                      MediaQuery.of(context).size.width < 400 ? 16.0 : 32.0),
               child: Column(
                 children: const [
                   SizedBox(
-                    height: 100.0,
-                    width: 100.0,
+                    height: 90.0,
+                    width: 90.0,
                     child: Image(image: AssetImage('images/logo.png')),
                   ),
                   Text(
@@ -100,11 +108,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       color: Colors.white,
                     ),
                   ),
-                  SizedBox(height: 16.0),
+                  SizedBox(height: 14.0),
                   Text(
                     'Create an account to continue',
                     style: TextStyle(
-                      fontSize: 16.0,
+                      fontSize: 14.0,
                       color: Colors.grey,
                     ),
                   ),
@@ -125,6 +133,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   borderRadius: BorderRadius.circular(10),
                 ),
                 hintText: 'Email address',
+                contentPadding: EdgeInsets.symmetric(
+                  vertical: MediaQuery.of(context).size.width < 400 ? 10 : 20,
+                  horizontal: MediaQuery.of(context).size.width < 400 ? 10 : 20,
+                ),
+                hintStyle: TextStyle(
+                  fontSize: MediaQuery.of(context).size.width < 400 ? 12 : 14,
+                ),
               ),
             ),
             if (_formErrors.containsKey('email'))
@@ -134,7 +149,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         style: const TextStyle(color: Colors.red),
                       ))
                   .toList(),
-            const SizedBox(height: 16.0),
+            const SizedBox(height: 12.0),
             TextFormField(
               controller: _passwordController,
               decoration: InputDecoration(
@@ -149,6 +164,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   borderRadius: BorderRadius.circular(10),
                 ),
                 hintText: 'Password',
+                contentPadding: EdgeInsets.symmetric(
+                  vertical: MediaQuery.of(context).size.width < 400 ? 10 : 20,
+                  horizontal: MediaQuery.of(context).size.width < 400 ? 10 : 20,
+                ),
+                hintStyle: TextStyle(
+                  fontSize: MediaQuery.of(context).size.width < 400 ? 12 : 14,
+                ),
                 suffixIcon: IconButton(
                   icon: Icon(
                     _obscurePassword ? Icons.visibility_off : Icons.visibility,

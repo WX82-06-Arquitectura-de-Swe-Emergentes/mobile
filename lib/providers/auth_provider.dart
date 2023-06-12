@@ -32,8 +32,8 @@ class AuthenticationProvider extends ChangeNotifier {
     if (response.statusCode == 400) {
       final jsonBody = jsonDecode(response.body);
       final errors = jsonBody['errors'];
-      final emailErrors = errors['email'] as List<dynamic> ?? [];
-      final passwordErrors = errors['password'] as List<dynamic> ?? [];
+      final emailErrors = errors['email'] as List<dynamic>;
+      final passwordErrors = errors['password'] as List<dynamic>;
 
       final emailErrorText =
           emailErrors.isNotEmpty ? emailErrors[0].toString() : null;
@@ -67,8 +67,8 @@ class AuthenticationProvider extends ChangeNotifier {
     if (response.statusCode == 400 && response.body.contains('errors')) {
       final jsonBody = jsonDecode(response.body);
       final errors = jsonBody['errors'];
-      final emailErrors = errors['email'] as List<dynamic> ?? [];
-      final passwordErrors = errors['password'] as List<dynamic> ?? [];
+      final emailErrors = errors['email'] as List<dynamic>;
+      final passwordErrors = errors['password'] as List<dynamic>;
 
       final emailErrorText =
           emailErrors.isNotEmpty ? emailErrors[0].toString() : null;
@@ -81,6 +81,18 @@ class AuthenticationProvider extends ChangeNotifier {
       };
 
       throw ApiException(errors: validationErrors);
+    } else {
+      final jsonBody = jsonDecode(response.body);
+      throw ApiException(message: jsonBody['message']);
+    }
+  }
+
+  Future<dynamic> updateUser(String email, String mobileToken) async {
+    final response =
+        await _authenticationService.updateUser(email, mobileToken);
+
+    if (response.statusCode == 200) {
+      return;
     } else {
       final jsonBody = jsonDecode(response.body);
       throw ApiException(message: jsonBody['message']);
