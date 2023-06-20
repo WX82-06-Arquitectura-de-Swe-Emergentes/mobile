@@ -137,7 +137,7 @@ class _TripDetailsScreenState extends State<TripDetailsScreen> {
               child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    ImageSliderWidget(images: trip.images),
+                    PaginatedSlider(images: trip.images),
                     const SizedBox(height: 16.0),
                     Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,

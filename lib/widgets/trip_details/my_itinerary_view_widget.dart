@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/models/trip_item.dart';
 import 'package:frontend/shared/globals.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:frontend/widgets/trip_details/map_view.dart';
 
 class MyItineraryViewWidget extends StatelessWidget {
   const MyItineraryViewWidget({super.key, required this.itineraries});
@@ -47,6 +47,19 @@ class ItineraryItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+
+  Future<void> openMap(String location,double latitude, double longitude) async {
+      await Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => MapView(
+            location: location,
+            latitude: latitude, 
+            longitude: longitude),
+        ),
+      );
+    }
+
     return Container(
         width: 300,
         margin: const EdgeInsets.symmetric(horizontal: 8),
@@ -80,6 +93,7 @@ class ItineraryItem extends StatelessWidget {
                     IconButton(
                       onPressed: () {
                         // Open Google Maps with the itinerary address
+                        openMap(itinerary.location,itinerary.latitude, itinerary.longitude);
                       },
                       icon: const Icon(Icons.map),
                       color: Colors.white,
@@ -132,69 +146,3 @@ class ItineraryItem extends StatelessWidget {
             )));
   }
 }
-
-// class ItineraryItem extends StatelessWidget {
-//   const ItineraryItem({super.key, required this.itinerary});
-
-//   final Itinerary itinerary;
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return Card(
-//       color: Globals.primaryColor,
-//       child: Column(
-//         mainAxisAlignment: MainAxisAlignment.center,
-//         children: [
-//           // Expanded(
-//           //   child: GoogleMap(
-//           //     initialCameraPosition: CameraPosition(
-//           //       target: LatLng(latitude, longitude),
-//           //       zoom: 15.0,
-//           //     ),
-//           //     markers: {
-//           //       Marker(
-//           //         markerId: const MarkerId('exact_location'),
-//           //         position: LatLng(latitude, longitude),
-//           //       ),
-//           //     },
-//           //   ),
-//           // ),
-//           Row(children: [
-//             Text("hi", style: TextStyle(
-//               fontSize: 48,
-//               fontWeight: FontWeight.bold,
-//               color: Colors.white,
-//             ),),Text("hi", style: TextStyle(
-//               fontSize: 48,
-//               fontWeight: FontWeight.bold,
-//               color: Colors.white,
-//             ),)
-//           ],),
-//           Text(
-//             "Day ${itinerary.day}",
-//             style: TextStyle(
-//               fontSize: 48,
-//               fontWeight: FontWeight.bold,
-//               color: Colors.white,
-//             ),
-//           ),
-//           Column(
-//             crossAxisAlignment: CrossAxisAlignment.start,
-//             children: itinerary.activities.map((activity) {
-//               return Row(
-//                 children: [
-//                   const Icon(Icons.check, color: Colors.green),
-//                   const SizedBox(width: 8.0),
-//                   Text(
-//                     activity,
-//                     style: const TextStyle(fontSize: 16.0, color: Colors.white),
-//                   ),
-//                 ],
-//               );
-//             }).toList(),
-//           ),
-//         ],
-//       ),
-//     );
-//   }
-// }

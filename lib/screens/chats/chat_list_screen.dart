@@ -13,8 +13,9 @@ class ChatListScreen extends StatefulWidget {
   const ChatListScreen({Key? key}) : super(key: key);
 
   @override
-  // ignore: library_private_types_in_public_api
-  _ChatListScreenState createState() => _ChatListScreenState();
+  State<ChatListScreen> createState() {
+    return _ChatListScreenState();
+  }
 }
 
 class _ChatListScreenState extends State<ChatListScreen> {
@@ -23,7 +24,7 @@ class _ChatListScreenState extends State<ChatListScreen> {
   final memberDao = MemberDao();
   late List<Map<dynamic, dynamic>> chats;
   late AuthenticationProvider authProvider;
-  bool _isLoading = false;
+  bool _isLoading = true;
 
   @override
   void initState() {
@@ -35,35 +36,6 @@ class _ChatListScreenState extends State<ChatListScreen> {
     chats = [];
     _loadChatsForMember();
   }
-
-  // Future<void> _loadChatsForMember() async {
-  //   final _chats = <Map<dynamic, dynamic>>[];
-  //   memberDao
-  //       .getMemberQuery()
-  //       .orderByChild(widget.auth.username)
-  //       .equalTo(true)
-  //       .onValue
-  //       .listen((DatabaseEvent event) {
-  //     if (event.snapshot.value == null) {
-  //       return;
-  //     }
-
-  //     final json = event.snapshot.value as Map<dynamic, dynamic>;
-  //     final memberChatsIds = json.keys.toList();
-
-  //     chatDao.getChatQuery().onValue.listen((DatabaseEvent event) {
-  //       final json = event.snapshot.value as Map<dynamic, dynamic>;
-  //       json.forEach((key, value) {
-  //         print(key);
-  //         if (memberChatsIds.contains(key)) {
-  //           Chat chatCopy = Chat.fromJson(value);
-  //           _chats.add(chatCopy.toJson());
-  //         }
-  //       });
-  //       setStateIfMounted(_chats);
-  //     });
-  //   });
-  // }
 
   Future<void> _loadChatsForMember() async {
     final _chats = <Map<dynamic, dynamic>>[];

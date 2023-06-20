@@ -6,7 +6,6 @@ import 'package:frontend/shared/globals.dart';
 import 'package:frontend/widgets/app_bar.dart';
 import 'package:provider/provider.dart';
 
-
 class TripScreen extends StatefulWidget {
   const TripScreen({super.key});
 
@@ -26,29 +25,25 @@ class _TripScreenState extends State<TripScreen> {
 
     return Scaffold(
       backgroundColor: Globals.backgroundColor,
-      bottomNavigationBar: AppBarBack(),
+      bottomNavigationBar: const AppBarBack(),
       appBar: AppBar(
         title: const Text("Trips"),
         backgroundColor: Globals.redColor,
-      ),
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          TextButton(
-            child: const Text("Filtrar"),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.filter_list),
             onPressed: () {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                    builder: (context) =>
-                        FilterScreen(token: authProvider.token)),
+                  builder: (context) => FilterScreen(token: authProvider.token),
+                ),
               );
             },
           ),
-          const TripListScreen(),
         ],
       ),
+      body: const TripListScreen(),
     );
   }
 }

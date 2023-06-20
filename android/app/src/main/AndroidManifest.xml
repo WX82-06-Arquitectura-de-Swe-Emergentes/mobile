@@ -2,9 +2,9 @@
     package="com.example.frontend">
 	 <uses-permission android:name="android.permission.INTERNET" />
    <application
-        android:label="frontend"
+        android:label="AdventureHub"
         android:name="${applicationName}"
-        android:icon="@mipmap/ic_launcher">
+        android:icon="@mipmap/launcher_icon">
 
     <meta-data android:name="com.google.android.geo.API_KEY"
                android:value="AIzaSyBtkuRp7ib1xcDXS0_KrSiBhO59Vf1m3OI"/>

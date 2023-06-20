@@ -29,10 +29,10 @@ class _LoginScreenState extends State<LoginScreen> {
 
     final auth = Provider.of<AuthenticationProvider>(context, listen: false);
 
-    // final email = "patrick@gmail.com" ?? _emailController.text;
-    // final password = "admin123" ?? _passwordController.text;
-    final email = _emailController.text;
+    final email =  _emailController.text;
     final password = _passwordController.text;
+    // final email = _emailController.text;
+    // final password = _passwordController.text;
 
     try {
       await auth.signIn(email, password);
