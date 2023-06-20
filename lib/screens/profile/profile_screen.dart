@@ -34,14 +34,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
             children: [
               SizedBox(
                 width: double.infinity,
-                //margin: const EdgeInsets.symmetric(horizontal: 10),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
                     GestureDetector(
                       child: const Card(
                         color: Color.fromARGB(255, 16, 20, 30),
-                        margin: EdgeInsets.only(top: 220),
+                        margin: EdgeInsets.only(top: 20),
                         child: ListTile(
                           leading: Icon(
                             Icons.settings,
@@ -178,59 +177,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
               height: MediaQuery.of(context).size.height,
             ),
           ),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              const Padding(
-                padding: EdgeInsets.all(20),
-              ),
-              Container(
-                padding: const EdgeInsets.all(10.0),
-                width: MediaQuery.of(context).size.width / 3,
-                height: MediaQuery.of(context).size.width / 3,
-                decoration: BoxDecoration(
-                  border: Border.all(color: Colors.white, width: 5),
-                  shape: BoxShape.circle,
-                  color: Colors.white,
-                  image: const DecorationImage(
-                    fit: BoxFit.cover,
-                    image: AssetImage('images/profile.png'),
-                  ),
-                ),
-              ),
-            ],
-          ),
-          Padding(
-            padding: const EdgeInsets.only(bottom: 270, left: 120),
-            child: CircleAvatar(
-              backgroundColor: Colors.black54,
-              child: IconButton(
-                icon: const Icon(
-                  Icons.edit,
-                  color: Colors.white,
-                ),
-                onPressed: () {},
-              ),
-            ),
-          )
         ],
       ),
     );
   }
-}
-
-class HeaderCurvedContainer extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    Paint paint = Paint()..color = const Color.fromARGB(255, 255, 58, 58);
-    Path path = Path()
-      ..relativeLineTo(0, 150)
-      ..quadraticBezierTo(size.width / 2, 225, size.width, 150)
-      ..relativeLineTo(0, -150)
-      ..close();
-    canvas.drawPath(path, paint);
-  }
-
-  @override
-  bool shouldRepaint(CustomPainter oldDelegate) => false;
 }
