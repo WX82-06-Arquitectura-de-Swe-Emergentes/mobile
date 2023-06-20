@@ -22,7 +22,7 @@ class MyReviewViewWidget extends StatelessWidget {
               color: Colors.white,
             ),
           )
-        ]),
+        ],),
         const SizedBox(height: 16),
         reviews.isNotEmpty ?
         SizedBox(
