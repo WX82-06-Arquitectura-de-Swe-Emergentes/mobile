@@ -29,25 +29,21 @@ class _TripScreenState extends State<TripScreen> {
       appBar: AppBar(
         title: const Text("Trips"),
         backgroundColor: Globals.redColor,
-      ),
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          TextButton(
-            child: const Text("Filtrar"),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.filter_list),
             onPressed: () {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                    builder: (context) =>
-                        FilterScreen(token: authProvider.token)),
+                  builder: (context) => FilterScreen(token: authProvider.token),
+                ),
               );
             },
           ),
-          const TripListScreen(),
         ],
       ),
+      body: const TripListScreen(),
     );
   }
 }
