@@ -100,4 +100,3 @@ class _TripListScreenState extends State<TripListScreen> {
     );
   }
 }
-

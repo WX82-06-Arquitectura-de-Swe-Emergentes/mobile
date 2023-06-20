@@ -26,6 +26,7 @@ class _ChatListScreenState extends State<ChatListScreen> {
   late AuthenticationProvider authProvider;
   bool _isLoading = true;
 
+
   @override
   void initState() {
     super.initState();

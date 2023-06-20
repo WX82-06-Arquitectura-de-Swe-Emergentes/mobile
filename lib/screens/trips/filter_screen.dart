@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import 'package:frontend/models/destination.dart';
 import 'package:frontend/models/filter.dart';
 import 'package:frontend/models/season.dart';
