@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:frontend/models/trip_item.dart';
 import 'package:frontend/shared/globals.dart';
 import 'package:frontend/widgets/trip_details/map_view.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 class MyItineraryViewWidget extends StatelessWidget {
   const MyItineraryViewWidget({super.key, required this.itineraries});
@@ -10,7 +11,8 @@ class MyItineraryViewWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final sortedItineraries = itineraries.toList()..sort((a, b) => a.day.compareTo(b.day));
+    final sortedItineraries = itineraries.toList()
+      ..sort((a, b) => a.day.compareTo(b.day));
 
     return Column(
       children: [
@@ -47,17 +49,21 @@ class ItineraryItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
-  Future<void> openMap(String location,double latitude, double longitude) async {
+    Future<void> openMap(
+        String location, double latitude, double longitude) async {
       await Navigator.push(
         context,
         MaterialPageRoute(
           builder: (context) => MapView(
-            location: location,
-            latitude: latitude, 
-            longitude: longitude),
+              location: location, latitude: latitude, longitude: longitude),
         ),
       );
+    }
+
+    Future<bool> setPermissions() async {
+      // Request location permission
+      final permissionStatus = await Permission.location.request();
+      return permissionStatus == PermissionStatus.granted;
     }
 
     return Container(
@@ -92,8 +98,13 @@ class ItineraryItem extends StatelessWidget {
                     ),
                     IconButton(
                       onPressed: () {
-                        // Open Google Maps with the itinerary address
-                        openMap(itinerary.location,itinerary.latitude, itinerary.longitude);
+                        setPermissions().then((granted) {
+                          if (granted) {
+                            // Open Google Maps with the itinerary address
+                            openMap(itinerary.location, itinerary.latitude,
+                                itinerary.longitude);
+                          }
+                        });
                       },
                       icon: const Icon(Icons.map),
                       color: Colors.white,
