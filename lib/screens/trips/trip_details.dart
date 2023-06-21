@@ -12,6 +12,10 @@ import 'package:frontend/widgets/trip_details/my_itinerary_view_widget.dart';
 import 'package:frontend/widgets/trip_details/my_review_view_widget.dart';
 import 'package:frontend/widgets/trip_details/section_display.widget.dart';
 import 'package:intl/intl.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:http/http.dart' as http;
+import 'package:flutter_stripe/flutter_stripe.dart';
+import 'dart:convert';
 
 class TripDetailsScreen extends StatefulWidget {
   final int tripId;
@@ -30,6 +34,7 @@ class _TripDetailsScreenState extends State<TripDetailsScreen> {
   TripService tripService = TripService();
   ChatDao chatDao = ChatDao();
   MemberDao memberDao = MemberDao();
+  Map<String, dynamic>? paymentIntent;
 
   Future<TripItem> fetchData() async {
     return tripService
@@ -108,6 +113,99 @@ class _TripDetailsScreenState extends State<TripDetailsScreen> {
     } else {
       return max;
     }
+  }
+
+  Future<void> makePayment(String priceTrip) async {
+    try {
+      paymentIntent = await createPaymentIntent(priceTrip, 'PEN');
+
+      await Stripe.instance
+          .initPaymentSheet(
+              paymentSheetParameters: SetupPaymentSheetParameters(
+                  paymentIntentClientSecret: paymentIntent!['client_secret'],
+                  style: ThemeMode.dark,
+                  merchantDisplayName: 'Damian'))
+          .then((value) {});
+
+      //STEP 3: Display Payment sheet
+      displayPaymentSheet();
+    } catch (err) {
+      throw Exception(err);
+    }
+  }
+
+  displayPaymentSheet() async {
+    try {
+      await Stripe.instance.presentPaymentSheet().then((value) {
+        showDialog(
+            context: context,
+            builder: (_) =>  AlertDialog(
+                  content: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        Icons.check_circle,
+                        color: Colors.green,
+                        size: 100.0,
+                      ),
+                      SizedBox(height: 10.0),
+                      Text("Pago exitoso!"),
+                    ],
+                  ),
+                ));
+
+        paymentIntent = null;
+      }).onError((error, stackTrace) {
+        throw Exception(error);
+      });
+    } on StripeException catch (e) {
+      print('Error is:---> $e');
+       AlertDialog(
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Row(
+              children: [
+                Icon(
+                  Icons.cancel,
+                  color: Colors.red,
+                ),
+                Text("Pago fallido!"),
+              ],
+            ),
+          ],
+        ),
+      );
+    } catch (e) {
+      print('$e');
+    }
+  }
+
+  createPaymentIntent(String amount, String currency) async {
+    try {
+      Map<String, dynamic> body = {
+        'amount': calculateAmount(amount),
+        'currency': currency,
+      };
+
+      //Make post request to Stripe
+      var response = await http.post(
+        Uri.parse('https://api.stripe.com/v1/payment_intents'),
+        headers: {
+          'Authorization': 'Bearer ${dotenv.env['STRIPE_SECRET']}',
+          'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        body: body,
+      );
+      return json.decode(response.body);
+    } catch (err) {
+      throw Exception(err.toString());
+    }
+  }
+
+  calculateAmount(String amount) {
+    final calculatedAmout = (int.parse(amount)) * 100;
+    return calculatedAmout.toString();
   }
 
   @override
@@ -224,13 +322,14 @@ class _TripDetailsScreenState extends State<TripDetailsScreen> {
                   ]),
             )),
             floatingActionButton: FloatingActionButton.extended(
-              onPressed: () {
-                // Lógica para comprar el viaje
+              onPressed: () async {
+                await makePayment(trip.price.toInt().toString());
               },
               label: const Text(''),
               icon: Row(
                 children: [
-                  Icon(Icons.shopping_cart, size: responsiveValue(16.0, 20.0, 400)),
+                  Icon(Icons.shopping_cart,
+                      size: responsiveValue(16.0, 20.0, 400)),
                   SizedBox(width: responsiveValue(8.0, 12.0, 400)),
                   Text(formatPriceToPenTwoDecimals(trip.price),
                       style: TextStyle(
