@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/firebase/notification/push_notifications_service.dart';
+import 'package:frontend/models/user.dart';
+import 'package:frontend/providers/auth_provider.dart';
 
 class AccountSettingScreen extends StatefulWidget {
   const AccountSettingScreen({Key? key, this.token}) : super(key: key);
@@ -9,11 +12,14 @@ class AccountSettingScreen extends StatefulWidget {
 }
 
 class _AccountSettingScreenState extends State<AccountSettingScreen> {
+  final authProvider = AuthenticationProvider();
   final _formKey = GlobalKey<FormState>(); // Clave para el formulario
-  TextEditingController _emailController = TextEditingController();
-  TextEditingController _oldPasswordController = TextEditingController();
-  TextEditingController _newPasswordController = TextEditingController();
-  TextEditingController _confirmPasswordController = TextEditingController();
+
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _oldPasswordController = TextEditingController();
+  final TextEditingController _newPasswordController = TextEditingController();
+  final TextEditingController _confirmPasswordController =
+      TextEditingController();
 
   void _showDeleteAccountDialog() {
     showDialog(
@@ -35,6 +41,7 @@ class _AccountSettingScreenState extends State<AccountSettingScreen> {
               onPressed: () {
                 // TODO: Implement delete account logic
                 Navigator.of(context).pop();
+
                 showDialog(
                   context: context,
                   builder: (BuildContext context) {
@@ -179,7 +186,8 @@ class _AccountSettingScreenState extends State<AccountSettingScreen> {
                 TextFormField(
                   controller: _emailController,
                   decoration:
-                      const InputDecoration(labelText: 'Correo electrónico'),
+                      const InputDecoration(labelText: "Correo electrónico"),
+                  //initialValue: _emailController.text,
                   validator: (value) {
                     if (value!.isEmpty) {
                       return 'Por favor, ingresa tu correo electrónico';
@@ -187,20 +195,20 @@ class _AccountSettingScreenState extends State<AccountSettingScreen> {
                     return null;
                   },
                 ),
-                TextFormField(
-                  controller: _oldPasswordController,
-                  decoration:
-                      const InputDecoration(labelText: 'Password actual'),
-                  validator: (value) {
-                    if (value!.isEmpty) {
-                      return 'Por favor, ingresa tu password';
-                    }
-                    return null;
-                  },
-                  onTap: () {
-                    _showChangePasswordDialog();
-                  },
-                ),
+                // TextFormField(
+                //   controller: _oldPasswordController,
+                //   decoration:
+                //       const InputDecoration(labelText: 'Password actual'),
+                //   validator: (value) {
+                //     if (value!.isEmpty) {
+                //       return 'Por favor, ingresa tu password';
+                //     }
+                //     return null;
+                //   },
+                //   onTap: () {
+                //     _showChangePasswordDialog();
+                //   },
+                // ),
                 const SizedBox(height: 16.0),
                 ElevatedButton(
                   onPressed: _submitForm,
@@ -209,7 +217,8 @@ class _AccountSettingScreenState extends State<AccountSettingScreen> {
                 const SizedBox(height: 16.0),
                 TextButton(
                   onPressed: () {
-                    // TODO: Implement password recovery functionality
+                    authProvider.updateUser(_emailController.text,
+                        PushNotificationService.tokenValue);
                     showDialog(
                       context: context,
                       builder: (BuildContext context) {
