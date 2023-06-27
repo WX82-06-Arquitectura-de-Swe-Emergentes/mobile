@@ -139,10 +139,10 @@ class _TripDetailsScreenState extends State<TripDetailsScreen> {
       await Stripe.instance.presentPaymentSheet().then((value) {
         showDialog(
             context: context,
-            builder: (_) =>  AlertDialog(
+            builder: (_) => AlertDialog(
                   content: Column(
                     mainAxisSize: MainAxisSize.min,
-                    children: [
+                    children: const [
                       Icon(
                         Icons.check_circle,
                         color: Colors.green,
@@ -160,12 +160,12 @@ class _TripDetailsScreenState extends State<TripDetailsScreen> {
       });
     } on StripeException catch (e) {
       print('Error is:---> $e');
-       AlertDialog(
+      AlertDialog(
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             Row(
-              children: [
+              children: const [
                 Icon(
                   Icons.cancel,
                   color: Colors.red,
@@ -208,6 +208,10 @@ class _TripDetailsScreenState extends State<TripDetailsScreen> {
     return calculatedAmout.toString();
   }
 
+  isTraveler() {
+    return widget.auth.role == "TRAVELER";
+  }
+
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<TripItem>(
@@ -248,17 +252,17 @@ class _TripDetailsScreenState extends State<TripDetailsScreen> {
                                     fontWeight: FontWeight.bold,
                                     color: Colors.white)),
                           ),
-                          const SizedBox(width: 8),
-                          Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                ElevatedButton(
-                                    onPressed: () {
-                                      createChat(trip);
-                                    },
-                                    child: const Icon(Icons.chat,
-                                        color: Colors.white))
-                              ]),
+                          if (isTraveler())
+                            Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  ElevatedButton(
+                                      onPressed: () {
+                                        createChat(trip);
+                                      },
+                                      child: const Icon(Icons.chat,
+                                          color: Colors.white))
+                                ]),
                         ]),
                     const SizedBox(height: 24.0),
                     Row(
@@ -321,23 +325,26 @@ class _TripDetailsScreenState extends State<TripDetailsScreen> {
                     const SizedBox(height: 24.0),
                   ]),
             )),
-            floatingActionButton: FloatingActionButton.extended(
-              onPressed: () async {
-                await makePayment(trip.price.toInt().toString());
-              },
-              label: const Text(''),
-              icon: Row(
-                children: [
-                  Icon(Icons.shopping_cart,
-                      size: responsiveValue(16.0, 20.0, 400)),
-                  SizedBox(width: responsiveValue(8.0, 12.0, 400)),
-                  Text(formatPriceToPenTwoDecimals(trip.price),
-                      style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: responsiveValue(12.0, 16.0, 400))),
-                ],
+            floatingActionButton: Visibility(
+              visible: isTraveler(),
+              child: FloatingActionButton.extended(
+                onPressed: () async {
+                  await makePayment(trip.price.toInt().toString());
+                },
+                label: const Text(''),
+                icon: Row(
+                  children: [
+                    Icon(Icons.shopping_cart,
+                        size: responsiveValue(16.0, 20.0, 400)),
+                    SizedBox(width: responsiveValue(8.0, 12.0, 400)),
+                    Text(formatPriceToPenTwoDecimals(trip.price),
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: responsiveValue(12.0, 16.0, 400))),
+                  ],
+                ),
+                backgroundColor: Colors.red,
               ),
-              backgroundColor: Colors.red,
             ),
             floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
           );
