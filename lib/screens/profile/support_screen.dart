@@ -120,10 +120,63 @@ class _SupportScreenState extends State<SupportScreen> {
                 onPressed: _sendForm,
                 child: const Text('Enviar'),
               ),
+              const SizedBox(height: 20),
+              const Text(
+                'Preguntas frecuentes',
+                style: TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 16),
+              const FAQItem(
+                question: '¿Cómo puedo reservar un vuelo?',
+                answer:
+                    'Para reservar un vuelo, debes seguir los siguientes pasos:\n\n1. Ingresa en nuestra aplicación y selecciona la opción de "Reservar vuelo".\n\n2. Selecciona tu origen y destino, así como las fechas de ida y regreso.\n\n3. Escoge la aerolínea y el horario que mejor se adapten a tus necesidades.\n\n4. Proporciona los datos personales de los pasajeros y realiza el pago.\n\n¡Listo! Tu vuelo ha sido reservado correctamente.',
+              ),
+              const FAQItem(
+                question: '¿Puedo cancelar o modificar mi reserva?',
+                answer:
+                    'Sí, puedes cancelar o modificar tu reserva siguiendo estos pasos:\n\n1. Accede a tu cuenta en nuestra aplicación y busca la sección de "Mis reservas".\n\n2. Encuentra la reserva que deseas cancelar o modificar y selecciona la opción correspondiente.\n\n3. Sigue las instrucciones proporcionadas para completar la cancelación o modificación.\n\nRecuerda que pueden aplicar políticas de cancelación o cambios según las condiciones de la aerolínea.',
+              ),
+              const FAQItem(
+                question: '¿Cómo puedo contactar al servicio al cliente?',
+                answer:
+                    'Para contactar a nuestro servicio al cliente, puedes hacer lo siguiente:\n\n1. Envíanos un correo electrónico a support@example.com.\n\n2. Llama a nuestro número de atención al cliente +1-123-456-7890.\n\n3. Utiliza el formulario de contacto en nuestra aplicación y describe tu consulta o problema.\n\nEstaremos encantados de ayudarte en lo que necesites.',
+              ),
             ],
           ),
         ),
       ),
+    );
+  }
+}
+
+class FAQItem extends StatelessWidget {
+  final String question;
+  final String answer;
+
+  const FAQItem({
+    Key? key,
+    required this.question,
+    required this.answer,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return ExpansionTile(
+      title: Text(
+        question,
+        style: const TextStyle(
+          fontWeight: FontWeight.bold,
+        ),
+      ),
+      children: [
+        Padding(
+          padding: const EdgeInsets.symmetric(vertical: 8.0),
+          child: Text(answer),
+        ),
+      ],
     );
   }
 }
