@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/shared/globals.dart';
 
 class AccountSettingScreen extends StatefulWidget {
   const AccountSettingScreen({Key? key, this.token}) : super(key: key);
@@ -166,6 +167,7 @@ class _AccountSettingScreenState extends State<AccountSettingScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Globals.backgroundColor,
       appBar: AppBar(
         title: const Text('Account settings'),
       ),
@@ -178,8 +180,16 @@ class _AccountSettingScreenState extends State<AccountSettingScreen> {
               children: [
                 TextFormField(
                   controller: _emailController,
-                  decoration:
-                      const InputDecoration(labelText: 'Correo electrónico'),
+                  decoration: const InputDecoration(
+                    labelText: 'Correo electrónico',
+                    labelStyle: TextStyle(color: Colors.grey),
+                    enabledBorder: UnderlineInputBorder(
+                      borderSide: BorderSide(color: Colors.white),
+                    ),
+                    focusedBorder: UnderlineInputBorder(
+                      borderSide: BorderSide(color: Colors.white),
+                    ),
+                  ),
                   validator: (value) {
                     if (value!.isEmpty) {
                       return 'Por favor, ingresa tu correo electrónico';
@@ -189,8 +199,16 @@ class _AccountSettingScreenState extends State<AccountSettingScreen> {
                 ),
                 TextFormField(
                   controller: _oldPasswordController,
-                  decoration:
-                      const InputDecoration(labelText: 'Password actual'),
+                  decoration: const InputDecoration(
+                    labelText: 'Password actual',
+                    labelStyle: TextStyle(color: Colors.grey),
+                    enabledBorder: UnderlineInputBorder(
+                      borderSide: BorderSide(color: Colors.white),
+                    ),
+                    focusedBorder: UnderlineInputBorder(
+                      borderSide: BorderSide(color: Colors.white),
+                    ),
+                  ),
                   validator: (value) {
                     if (value!.isEmpty) {
                       return 'Por favor, ingresa tu password';

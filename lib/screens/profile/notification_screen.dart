@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:frontend/shared/globals.dart';
 
 class NotificationScreen extends StatefulWidget {
   const NotificationScreen({Key? key}) : super(key: key);
@@ -85,23 +86,28 @@ class _NotificationScreenState extends State<NotificationScreen> {
     return WillPopScope(
       onWillPop: _onWillPop,
       child: Scaffold(
+        backgroundColor: Globals.backgroundColor,
         appBar: AppBar(
-          title: const Text('Account settings'),
+          title: const Text('Notification settings'),
         ),
         body: ListView(
           padding: const EdgeInsets.all(16.0),
           children: [
             ListTile(
-              title: const Text('Notifications promotional'),
-              subtitle: const Text('Receive promotional'),
+              title: const Text('Notifications promotional',
+                  style: TextStyle(color: Colors.white)),
+              subtitle: const Text('Receive promotional',
+                  style: TextStyle(color: Colors.grey)),
               trailing: Switch(
                 value: _receiveEmails,
                 onChanged: _updateReceiveEmails,
               ),
             ),
             ListTile(
-              title: const Text('Notifications offers'),
-              subtitle: const Text('Receive offers'),
+              title: const Text('Notifications offers',
+                  style: TextStyle(color: Colors.white)),
+              subtitle: const Text('Receive offers',
+                  style: TextStyle(color: Colors.grey)),
               trailing: Switch(
                 value: _receiveNotifications,
                 onChanged: _updateReceiveNotifications,

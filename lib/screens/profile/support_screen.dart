@@ -64,33 +64,36 @@ class _SupportScreenState extends State<SupportScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Globals.backgroundColor,
       appBar: AppBar(
         title: const Text('Help & Support'),
       ),
       body: SingleChildScrollView(
         child: Padding(
-          padding: const EdgeInsets.all(16.0),
+          padding: const EdgeInsets.all(20.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const Text(
                 '¿Necesitas ayuda?',
                 style: TextStyle(
-                  fontSize: 24,
+                  fontSize: 20,
                   fontWeight: FontWeight.bold,
+                  color: Colors.white,
                 ),
               ),
               const SizedBox(height: 16),
               const Text(
                 'Si tienes alguna pregunta o necesitas asistencia, no dudes en contactarnos. Estamos aquí para ayudarte en tu experiencia de viaje.',
-                style: TextStyle(fontSize: 16),
+                style: TextStyle(fontSize: 15, color: Colors.white),
               ),
               const SizedBox(height: 16),
               const Text(
                 'Pregunta:',
                 style: TextStyle(
-                  fontSize: 18,
+                  fontSize: 16,
                   fontWeight: FontWeight.bold,
+                  color: Colors.white,
                 ),
               ),
               const SizedBox(height: 8),
@@ -98,14 +101,23 @@ class _SupportScreenState extends State<SupportScreen> {
                 controller: _questionController,
                 decoration: const InputDecoration(
                   hintText: 'Escribe tu pregunta',
+                  hintStyle: TextStyle(color: Colors.grey),
+                  enabledBorder: UnderlineInputBorder(
+                    borderSide: BorderSide(color: Colors.white),
+                  ),
+                  focusedBorder: UnderlineInputBorder(
+                    borderSide: BorderSide(color: Colors.white),
+                  ),
                 ),
+                style: const TextStyle(color: Colors.white),
               ),
               const SizedBox(height: 16),
               const Text(
                 'Problema y solución intentada:',
                 style: TextStyle(
-                  fontSize: 18,
+                  fontSize: 16,
                   fontWeight: FontWeight.bold,
+                  color: Colors.white,
                 ),
               ),
               const SizedBox(height: 8),
@@ -113,7 +125,15 @@ class _SupportScreenState extends State<SupportScreen> {
                 controller: _problemController,
                 decoration: const InputDecoration(
                   hintText: 'Explica el problema y lo que has intentado',
+                  hintStyle: TextStyle(color: Colors.grey),
+                  enabledBorder: UnderlineInputBorder(
+                    borderSide: BorderSide(color: Colors.white),
+                  ),
+                  focusedBorder: UnderlineInputBorder(
+                    borderSide: BorderSide(color: Colors.white),
+                  ),
                 ),
+                style: const TextStyle(color: Colors.white),
               ),
               const SizedBox(height: 16),
               ElevatedButton(
@@ -124,8 +144,9 @@ class _SupportScreenState extends State<SupportScreen> {
               const Text(
                 'Preguntas frecuentes',
                 style: TextStyle(
-                  fontSize: 24,
+                  fontSize: 20,
                   fontWeight: FontWeight.bold,
+                  color: Colors.white,
                 ),
               ),
               const SizedBox(height: 16),
@@ -142,7 +163,7 @@ class _SupportScreenState extends State<SupportScreen> {
               const FAQItem(
                 question: '¿Cómo puedo contactar al servicio al cliente?',
                 answer:
-                    'Para contactar a nuestro servicio al cliente, puedes hacer lo siguiente:\n\n1. Envíanos un correo electrónico a support@example.com.\n\n2. Llama a nuestro número de atención al cliente +1-123-456-7890.\n\n3. Utiliza el formulario de contacto en nuestra aplicación y describe tu consulta o problema.\n\nEstaremos encantados de ayudarte en lo que necesites.',
+                    'Para contactar a nuestro servicio al cliente, puedes hacer lo siguiente:\n\n1. Envíanos un correo electrónico a AdventureHub@gmail.com.\n\n2. Llama a nuestro número de atención al cliente +1-123-456-7890.\n\n3. Utiliza el formulario de contacto en nuestra aplicación y describe tu consulta o problema.\n\nEstaremos encantados de ayudarte en lo que necesites.',
               ),
             ],
           ),
@@ -168,13 +189,17 @@ class FAQItem extends StatelessWidget {
       title: Text(
         question,
         style: const TextStyle(
-          fontWeight: FontWeight.bold,
+          color: Colors.white,
+          fontSize: 15,
         ),
       ),
       children: [
         Padding(
           padding: const EdgeInsets.symmetric(vertical: 8.0),
-          child: Text(answer),
+          child: Text(
+            answer,
+            style: const TextStyle(color: Colors.white),
+          ),
         ),
       ],
     );
