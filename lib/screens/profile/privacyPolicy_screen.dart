@@ -22,7 +22,6 @@ class _PrivacyPolicyScreenState extends State<PrivacyPolicyScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const SizedBox(height: 8),
             Container(
               alignment: Alignment.center,
               child: ClipRRect(
@@ -73,7 +72,7 @@ class _PrivacyPolicyScreenState extends State<PrivacyPolicyScreen> {
                 ),
               ),
             ),
-            const SizedBox(height: 10),
+            const SizedBox(height: 8),
             const FAQItem(
               question:
                   '¿Qué información se recopila cuando utilizo los servicios de AventureHub?',
