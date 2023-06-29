@@ -24,4 +24,12 @@ class AuthenticationService {
 
     return await ApiService.patch(endpoint, headers, body);
   }
+
+  Future<dynamic> updateEmail(String currentEmail, String newEmail) async {
+    final endpoint = '/auth/user/email?currentEmail=$currentEmail';
+    final headers = {'Content-Type': 'application/json'};
+    final body = {'email': newEmail};
+
+    return await ApiService.patch(endpoint, headers, body);
+  }
 }
