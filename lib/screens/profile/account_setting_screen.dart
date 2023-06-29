@@ -213,8 +213,8 @@ class _AccountSettingScreenState extends State<AccountSettingScreen> {
               children: [
                 TextFormField(
                   controller: _emailController,
-                  decoration:
-                      const InputDecoration(labelText: 'Correo electrónico'),
+                  decoration: const InputDecoration(
+                      labelText: 'Correo electrónico Actual'),
                   validator: (value) {
                     if (value!.isEmpty) {
                       return 'Por favor, ingresa tu correo electrónico actual';
@@ -224,8 +224,8 @@ class _AccountSettingScreenState extends State<AccountSettingScreen> {
                 ),
                 TextFormField(
                   controller: _oldPasswordController,
-                  decoration:
-                      const InputDecoration(labelText: 'Password actual'),
+                  decoration: const InputDecoration(
+                      labelText: 'Nuevo correo Electrónico'),
                   validator: (value) {
                     if (value!.isEmpty) {
                       return 'Por favor, ingresa tu nuevo correo electrónico';
