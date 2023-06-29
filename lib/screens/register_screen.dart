@@ -18,6 +18,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final TextEditingController _passwordController = TextEditingController();
   bool _isLoading = false;
   bool _obscurePassword = true;
+  bool _termsAccepted = false;
   String _role = "Traveler";
   Map<String, List<dynamic>> _formErrors = {};
 
@@ -193,9 +194,32 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         style: const TextStyle(color: Colors.red),
                       ))
                   .toList(),
-            const SizedBox(height: 32.0),
+            const SizedBox(height: 5.0),
+            Row(
+              children: [
+                Checkbox(
+                  value: _termsAccepted,
+                  onChanged: (value) {
+                    setState(() {
+                      _termsAccepted = value!;
+                    });
+                  },
+                  visualDensity: VisualDensity.compact,
+                  fillColor:
+                      MaterialStateColor.resolveWith((states) => Colors.white),
+                  checkColor: Colors.red,
+                ),
+                const Text(
+                  'Acepto las políticas de privacidad y seguridad',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 13.0,
+                  ),
+                ),
+              ],
+            ),
             ElevatedButton(
-              onPressed: _isLoading ? null : _handleRegister,
+              onPressed: _isLoading || !_termsAccepted ? null : _handleRegister,
               child: _isLoading
                   ? const CircularProgressIndicator()
                   : const Text('SIGN UP'),

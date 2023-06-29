@@ -4,6 +4,7 @@ import 'package:frontend/firebase/notification/push_notifications_service.dart';
 import 'package:frontend/shared/globals.dart';
 import 'package:provider/provider.dart';
 import 'package:frontend/providers/auth_provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -17,8 +18,10 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+  SharedPreferences? _prefs;
   bool _isLoading = false;
   bool _obscurePassword = true;
+  bool _rememberUser = false;
   Map<String, List<dynamic>> _formErrors = {};
 
   void _handleLogin() async {
@@ -37,6 +40,12 @@ class _LoginScreenState extends State<LoginScreen> {
 
       if (PushNotificationService.tokenValue != '') {
         await auth.updateUser(email, PushNotificationService.tokenValue);
+      }
+
+      if (_rememberUser) {
+        await savePreferences(email, password);
+      } else {
+        await clearPreferences();
       }
 
       Future.delayed(Duration.zero, () {
@@ -79,6 +88,40 @@ class _LoginScreenState extends State<LoginScreen> {
     });
   }
 
+  Future<void> savePreferences(String email, String password) async {
+    if (_prefs != null) {
+      await _prefs!.setString('email', email);
+      await _prefs!.setString('password', password);
+    }
+  }
+
+  @override
+  void initState() {
+    loadPreferences();
+    super.initState();
+  }
+
+  void loadPreferences() async {
+    _prefs = await SharedPreferences.getInstance();
+    if (_prefs != null) {
+      setState(() {
+        _rememberUser = _prefs!.getString('email') != null &&
+            _prefs!.getString('password') != null;
+        if (_rememberUser) {
+          _emailController.text = _prefs!.getString('email') ?? '';
+          _passwordController.text = _prefs!.getString('password') ?? '';
+        }
+      });
+    }
+  }
+
+  Future<void> clearPreferences() async {
+    if (_prefs != null) {
+      await _prefs!.remove('email');
+      await _prefs!.remove('password');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -98,8 +141,8 @@ class _LoginScreenState extends State<LoginScreen> {
               padding: EdgeInsets.only(
                   bottom:
                       MediaQuery.of(context).size.width < 400 ? 16.0 : 32.0),
-              child: Column(
-                children: const [
+              child: const Column(
+                children: [
                   SizedBox(
                     height: 90.0,
                     width: 90.0,
@@ -197,7 +240,31 @@ class _LoginScreenState extends State<LoginScreen> {
                         style: const TextStyle(color: Colors.red),
                       ))
                   .toList(),
-            const SizedBox(height: 32.0),
+            //Recordar Usuario
+            const SizedBox(height: 5.0),
+            Row(
+              children: [
+                Checkbox(
+                  value: _rememberUser,
+                  onChanged: (value) {
+                    setState(() {
+                      _rememberUser = value!;
+                    });
+                  },
+                  visualDensity: VisualDensity.compact,
+                  fillColor:
+                      MaterialStateColor.resolveWith((states) => Colors.white),
+                  checkColor: Colors.red,
+                ),
+                const Text(
+                  'Guardar mis credenciales',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 14.0,
+                  ),
+                ),
+              ],
+            ),
             ElevatedButton(
               onPressed: _isLoading ? null : _handleLogin,
               child: _isLoading

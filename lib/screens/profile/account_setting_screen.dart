@@ -220,6 +220,7 @@ class _AccountSettingScreenState extends State<AccountSettingScreen> {
                       borderSide: BorderSide(color: Colors.white),
                     ),
                   ),
+                  style: const TextStyle(color: Colors.white),
                   validator: (value) {
                     if (value!.isEmpty) {
                       return 'Por favor, ingresa tu correo electrónico Actual';
@@ -239,6 +240,7 @@ class _AccountSettingScreenState extends State<AccountSettingScreen> {
                       borderSide: BorderSide(color: Colors.white),
                     ),
                   ),
+                  style: const TextStyle(color: Colors.white),
                   validator: (value) {
                     if (value!.isEmpty) {
                       return 'Por favor, ingresa tu nuevo correo electrónico';
@@ -283,13 +285,6 @@ class _AccountSettingScreenState extends State<AccountSettingScreen> {
                     );
                   },
                   child: const Text('Recover Password'),
-                ),
-                const SizedBox(height: 16.0),
-                TextButton(
-                  onPressed: () {
-                    _showDeleteAccountDialog();
-                  },
-                  child: const Text('Delete Account'),
                 ),
               ],
             ),

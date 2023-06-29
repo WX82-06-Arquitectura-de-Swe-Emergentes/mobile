@@ -104,7 +104,7 @@ class AuthenticationProvider extends ChangeNotifier {
 
   Future<dynamic> updateEmail(String currentEmail, String newEmail) async {
     final response =
-    await _authenticationService.updateEmail(currentEmail, newEmail);
+        await _authenticationService.updateEmail(currentEmail, newEmail);
 
     if (response.statusCode == 200) {
       return;
@@ -112,6 +112,10 @@ class AuthenticationProvider extends ChangeNotifier {
       final jsonBody = jsonDecode(response.body);
       throw ApiException(message: jsonBody['message']);
     }
+  }
+
+  String getUsername() {
+    return _username;
   }
 
   void signOut() {
