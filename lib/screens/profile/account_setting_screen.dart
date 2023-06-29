@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/providers/auth_provider.dart';
 import 'package:frontend/shared/globals.dart';
-import 'package:frontend/firebase/notification/push_notifications_service.dart';
 
 class AccountSettingScreen extends StatefulWidget {
   const AccountSettingScreen({Key? key, this.token}) : super(key: key);
@@ -17,11 +16,10 @@ class _AccountSettingScreenState extends State<AccountSettingScreen> {
 
   final TextEditingController _oldEmailController = TextEditingController();
   final TextEditingController _newEmailController = TextEditingController();
-  final TextEditingController _emailController = TextEditingController();
-  final TextEditingController _oldPasswordController = TextEditingController();
-  final TextEditingController _newPasswordController = TextEditingController();
-  final TextEditingController _confirmPasswordController =
-      TextEditingController();
+  TextEditingController _emailController = TextEditingController();
+  TextEditingController _oldPasswordController = TextEditingController();
+  TextEditingController _newPasswordController = TextEditingController();
+  TextEditingController _confirmPasswordController = TextEditingController();
 
   void _showDeleteAccountDialog() {
     showDialog(
@@ -43,7 +41,6 @@ class _AccountSettingScreenState extends State<AccountSettingScreen> {
               onPressed: () {
                 // TODO: Implement delete account logic
                 Navigator.of(context).pop();
-
                 showDialog(
                   context: context,
                   builder: (BuildContext context) {
@@ -214,18 +211,34 @@ class _AccountSettingScreenState extends State<AccountSettingScreen> {
                 TextFormField(
                   controller: _emailController,
                   decoration: const InputDecoration(
-                      labelText: 'Correo electrónico Actual'),
+                    labelText: 'Correo electrónico Actual',
+                    labelStyle: TextStyle(color: Colors.grey),
+                    enabledBorder: UnderlineInputBorder(
+                      borderSide: BorderSide(color: Colors.white),
+                    ),
+                    focusedBorder: UnderlineInputBorder(
+                      borderSide: BorderSide(color: Colors.white),
+                    ),
+                  ),
                   validator: (value) {
                     if (value!.isEmpty) {
-                      return 'Por favor, ingresa tu correo electrónico actual';
+                      return 'Por favor, ingresa tu correo electrónico Actual';
                     }
                     return null;
                   },
                 ),
                 TextFormField(
-                  controller: _oldPasswordController,
+                  controller: _newEmailController,
                   decoration: const InputDecoration(
-                      labelText: 'Nuevo correo Electrónico'),
+                    labelText: 'Nuevo correo Electrónico',
+                    labelStyle: TextStyle(color: Colors.grey),
+                    enabledBorder: UnderlineInputBorder(
+                      borderSide: BorderSide(color: Colors.white),
+                    ),
+                    focusedBorder: UnderlineInputBorder(
+                      borderSide: BorderSide(color: Colors.white),
+                    ),
+                  ),
                   validator: (value) {
                     if (value!.isEmpty) {
                       return 'Por favor, ingresa tu nuevo correo electrónico';
@@ -241,8 +254,7 @@ class _AccountSettingScreenState extends State<AccountSettingScreen> {
                 const SizedBox(height: 16.0),
                 TextButton(
                   onPressed: () {
-                    authProvider.updateEmail(_emailController.text,
-                        PushNotificationService.tokenValue);
+                    // TODO: Implement password recovery functionality
                     showDialog(
                       context: context,
                       builder: (BuildContext context) {
