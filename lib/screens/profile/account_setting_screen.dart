@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/firebase/notification/push_notifications_service.dart';
-import 'package:frontend/models/user.dart';
 import 'package:frontend/providers/auth_provider.dart';
+import 'package:frontend/shared/globals.dart';
+import 'package:frontend/firebase/notification/push_notifications_service.dart';
 
 class AccountSettingScreen extends StatefulWidget {
   const AccountSettingScreen({Key? key, this.token}) : super(key: key);
@@ -200,6 +200,7 @@ class _AccountSettingScreenState extends State<AccountSettingScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Globals.backgroundColor,
       appBar: AppBar(
         title: const Text('Account settings'),
       ),
@@ -211,9 +212,9 @@ class _AccountSettingScreenState extends State<AccountSettingScreen> {
             child: Column(
               children: [
                 TextFormField(
-                  controller: _oldEmailController,
-                  decoration: const InputDecoration(
-                      labelText: 'Correo electrónico Actual'),
+                  controller: _emailController,
+                  decoration:
+                      const InputDecoration(labelText: 'Correo electrónico'),
                   validator: (value) {
                     if (value!.isEmpty) {
                       return 'Por favor, ingresa tu correo electrónico actual';
@@ -222,9 +223,9 @@ class _AccountSettingScreenState extends State<AccountSettingScreen> {
                   },
                 ),
                 TextFormField(
-                  controller: _newEmailController,
-                  decoration: const InputDecoration(
-                      labelText: 'Nuevo correo electrónico'),
+                  controller: _oldPasswordController,
+                  decoration:
+                      const InputDecoration(labelText: 'Password actual'),
                   validator: (value) {
                     if (value!.isEmpty) {
                       return 'Por favor, ingresa tu nuevo correo electrónico';
