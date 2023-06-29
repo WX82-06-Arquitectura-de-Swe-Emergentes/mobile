@@ -31,7 +31,7 @@ class _ChatConversationScreenState extends State<ChatConversationScreen> {
   final chatDao = ChatDao();
   final memberDao = MemberDao();
   final messageDao = MessageDao();
-  late List<dynamic> messages;
+  late dynamic messages;
 
   void setStateIfMounted(f) {
     if (mounted) {

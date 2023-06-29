@@ -6,9 +6,11 @@ import 'package:frontend/services/authentication_service.dart';
 class AuthenticationProvider extends ChangeNotifier {
   String? _token;
   String _username = "";
+  String? _role;
 
   String? get token => _token;
   String get username => _username;
+  String? get role => _role;
 
   final _authenticationService = AuthenticationService();
 
@@ -19,6 +21,7 @@ class AuthenticationProvider extends ChangeNotifier {
       final jsonBody = jsonDecode(response.body);
       _token = jsonBody["token"];
       _username = jsonBody["username"] ?? "";
+      _role = jsonBody["role"];
       notifyListeners();
       return;
     }
@@ -53,8 +56,8 @@ class AuthenticationProvider extends ChangeNotifier {
     }
   }
 
-  Future<dynamic> signUp(String email, String password) async {
-    final response = await _authenticationService.signUp(email, password);
+  Future<dynamic> signUp(String email, String password, String role) async {
+    final response = await _authenticationService.signUp(email, password, role);
 
     if (response.statusCode == 200) {
       final jsonBody = jsonDecode(response.body);

@@ -77,9 +77,10 @@ class _ChatListScreenState extends State<ChatListScreen> {
     chatRef.onValue.listen((event) {
       final chatIndex = chats.indexWhere((chat) => chat['id'] == chatId);
       if (chatIndex != -1) {
-        setState(() {
-          chats[chatIndex] = event.snapshot.value as Map<dynamic, dynamic>;
-        });
+        // setState(() {
+        //   chats[chatIndex] = event.snapshot.value as Map<dynamic, dynamic>;
+        // });
+        setStateIfMountedIndex(event.snapshot.value as Map<dynamic, dynamic>,chatIndex);
       }
     });
   }
@@ -88,6 +89,14 @@ class _ChatListScreenState extends State<ChatListScreen> {
     if (mounted) {
       setState(() {
         chats = f;
+      });
+    }
+  }
+
+  void setStateIfMountedIndex(f, index) {
+    if (mounted) {
+      setState(() {
+        chats[index] = f;
       });
     }
   }

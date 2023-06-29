@@ -18,6 +18,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final TextEditingController _passwordController = TextEditingController();
   bool _isLoading = false;
   bool _obscurePassword = true;
+  String _role = "Traveler";
   Map<String, List<dynamic>> _formErrors = {};
 
   void _handleRegister() async {
@@ -32,7 +33,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     final password = _passwordController.text;
 
     try {
-      await auth.signUp(email, password);
+      await auth.signUp(email, password, _role.toUpperCase());
 
       Future.delayed(Duration.zero, () {
         Navigator.of(context).pushReplacementNamed('/login');
@@ -94,22 +95,22 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   bottom:
                       MediaQuery.of(context).size.width < 400 ? 16.0 : 32.0),
               child: Column(
-                children: const [
-                  SizedBox(
+                children: [
+                  const SizedBox(
                     height: 90.0,
                     width: 90.0,
                     child: Image(image: AssetImage('images/logo.png')),
                   ),
                   Text(
-                    'Sign Up',
-                    style: TextStyle(
+                    'Sign Up as $_role',
+                    style: const TextStyle(
                       fontSize: 24.0,
                       fontWeight: FontWeight.bold,
                       color: Colors.white,
                     ),
                   ),
-                  SizedBox(height: 14.0),
-                  Text(
+                  const SizedBox(height: 14.0),
+                  const Text(
                     'Create an account to continue',
                     style: TextStyle(
                       fontSize: 14.0,
@@ -216,6 +217,29 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       ..onTap = () {
                         // Lógica del enlace aquí
                         Navigator.of(context).pushNamed('/signin');
+                      },
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 16.0),
+            RichText(
+              textAlign: TextAlign.center,
+              text: TextSpan(
+                text: 'I\'m a${_role == "Agency" ? "" : "n"} ',
+                style: const TextStyle(color: Colors.white),
+                children: <TextSpan>[
+                  TextSpan(
+                    text: _role == "Agency" ? "Traveler" : "Agency",
+                    style: const TextStyle(
+                      color: Colors.red,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    recognizer: TapGestureRecognizer()
+                      ..onTap = () {
+                        setState(() {
+                          _role = _role == "Agency" ? "Traveler" : "Agency";
+                        });
                       },
                   ),
                 ],
