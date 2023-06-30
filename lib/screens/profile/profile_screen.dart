@@ -204,7 +204,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         ),
                       ),
                       onTap: () {
-                        Navigator.pushNamed(context, '/signin');
+                        authenticationProvider.signOut();
+                        Navigator.of(context).pushReplacementNamed('/signin');
                       },
                     ),
                   ],

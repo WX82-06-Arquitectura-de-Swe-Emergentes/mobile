@@ -7,11 +7,15 @@ import 'package:frontend/providers/destination_provider.dart';
 import 'package:frontend/providers/season_provider.dart';
 import 'package:frontend/providers/trip_provider.dart';
 import 'package:frontend/shared/globals.dart';
+import 'package:frontend/utils/global_utils.dart';
 import 'package:provider/provider.dart';
 
 class FilterScreen extends StatefulWidget {
-  const FilterScreen({Key? key, required this.token}) : super(key: key);
+  const FilterScreen(
+      {Key? key, required this.token, required this.filterCallback})
+      : super(key: key);
   final String? token;
+  final Function filterCallback;
 
   @override
   State<FilterScreen> createState() {
@@ -19,39 +23,61 @@ class FilterScreen extends StatefulWidget {
   }
 }
 
+const double minPrice = 0;
+const double maxPrice = 5000;
+
 class _FilterScreenState extends State<FilterScreen> {
-  RangeValues _currentRangeValues = const RangeValues(0, 10000);
+  RangeValues _currentRangeValues = const RangeValues(minPrice, maxPrice);
   dynamic _selectedDestination;
   dynamic _selectedSeason;
   List<Destination> destinations = [];
   List<Season> seasons = [];
 
+  late DestinationProvider destinationProvider;
+  late SeasonProvider seasonProvider;
+  late TripProvider tripProvider;
+
   @override
   void initState() {
     super.initState();
 
-    getDestinations().then(
+    // widget.filterCallback();
+
+    destinationProvider = Provider.of<DestinationProvider>(
+      context,
+      listen: false,
+    );
+    seasonProvider = Provider.of<SeasonProvider>(
+      context,
+      listen: false,
+    );
+    tripProvider = Provider.of<TripProvider>(
+      context,
+      listen: false,
+    );
+
+    loadDestinations().then(
       (value) {
-        setState(() {
-          destinations = value;
-        });
+        if (mounted) {
+          setState(() {
+            destinations = value;
+          });
+        }
       },
     );
 
-    getSeasons().then(
+    loadSeasons().then(
       (value) {
-        setState(() {
-          seasons = value;
-        });
+        if (mounted) {
+          setState(() {
+            seasons = value;
+          });
+        }
       },
     );
   }
 
-  Future getDestinations() async {
-    final destinationProvider = Provider.of<DestinationProvider>(
-      context,
-      listen: false,
-    );
+  Future loadDestinations() async {
     if (destinationProvider.destination.isEmpty) {
       return await destinationProvider.getDestinations(widget.token);
     } else {
@@ -59,11 +85,7 @@ class _FilterScreenState extends State<FilterScreen> {
     }
   }
 
-  Future getSeasons() async {
-    final seasonProvider = Provider.of<SeasonProvider>(
-      context,
-      listen: false,
-    );
+  Future loadSeasons() async {
     if (seasonProvider.season.isEmpty) {
       return await seasonProvider.getSeasons(widget.token);
     } else {
@@ -78,22 +100,10 @@ class _FilterScreenState extends State<FilterScreen> {
       minPrice: _currentRangeValues.start,
       maxPrice: _currentRangeValues.end,
     );
-    final tripProvider = Provider.of<TripProvider>(
-      context,
-      listen: false,
-    );
 
-    tripProvider.getTripsFilter(widget.token, filters);
+    widget.filterCallback(widget.token, filters);
 
     Navigator.of(context).pop();
-  }
-
-  double responsiveValue(double min, double max, int defaultValue) {
-    if (MediaQuery.of(context).size.width < defaultValue) {
-      return min;
-    } else {
-      return max;
-    }
   }
 
   @override
@@ -185,8 +195,12 @@ class _FilterScreenState extends State<FilterScreen> {
                                                       ),
                                                     ),
                                                     SizedBox(
-                                                        height: responsiveValue(
-                                                            12.0, 24.0, 400),
+                                                        height: Utils
+                                                            .responsiveValue(
+                                                                context,
+                                                                12.0,
+                                                                24.0,
+                                                                400),
                                                         child: const Divider(
                                                             color: Colors
                                                                 .white24)),
@@ -304,7 +318,7 @@ class _FilterScreenState extends State<FilterScreen> {
                             ),
                           )),
                     SizedBox(
-                        height: responsiveValue(12.0, 24.0, 400),
+                        height: Utils.responsiveValue(context, 12.0, 24.0, 400),
                         child: const Divider(color: Colors.white24)),
                     Padding(
                       padding: const EdgeInsets.all(16),
@@ -351,8 +365,12 @@ class _FilterScreenState extends State<FilterScreen> {
                                                       ),
                                                     ),
                                                     SizedBox(
-                                                        height: responsiveValue(
-                                                            12.0, 24.0, 400),
+                                                        height: Utils
+                                                            .responsiveValue(
+                                                                context,
+                                                                12.0,
+                                                                24.0,
+                                                                400),
                                                         child: const Divider(
                                                             color: Colors
                                                                 .white24)),
@@ -469,7 +487,7 @@ class _FilterScreenState extends State<FilterScreen> {
                         ),
                       ),
                     SizedBox(
-                        height: responsiveValue(12.0, 24.0, 400),
+                        height: Utils.responsiveValue(context, 12.0, 24.0, 400),
                         child: const Divider(color: Colors.white24)),
                     Padding(
                         padding: const EdgeInsets.all(16),
@@ -498,9 +516,9 @@ class _FilterScreenState extends State<FilterScreen> {
                             const SizedBox(height: 16),
                             RangeSlider(
                               values: _currentRangeValues,
-                              min: 0,
-                              max: 10000,
-                              divisions: 10,
+                              min: minPrice,
+                              max: maxPrice,
+                              divisions: 50,
                               labels: RangeLabels(
                                 _currentRangeValues.start.round().toString(),
                                 _currentRangeValues.end.round().toString(),

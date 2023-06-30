@@ -11,37 +11,61 @@ class AppBarBack extends StatelessWidget implements PreferredSizeWidget {
     final auth = Provider.of<AuthenticationProvider>(context, listen: false);
     final currentIndex = _getCurrentIndex(context);
 
-    return BottomNavigationBar(
-      currentIndex: currentIndex,
-      onTap: (int i) {
-        _navigateToScreen(context, i, auth);
-      },
-      type: BottomNavigationBarType.fixed,
-      backgroundColor: Globals.primaryColor,
-      selectedItemColor: Globals.redColor,
-      unselectedItemColor: Colors.blueGrey,
-      iconSize: 25.0,
-      selectedFontSize: 14.0,
-      unselectedFontSize: 12.0,
-      items: const [
-        BottomNavigationBarItem(
-          icon: Icon(Icons.home),
-          label: '',
+    return Container(
+      decoration: const BoxDecoration(
+        border: Border(
+          top: BorderSide(
+            color: Colors.white24,
+            width: 1.0,
+          ),
         ),
-        BottomNavigationBarItem(
-          icon: Icon(Icons.question_answer),
-          label: '',
-        ),
-        BottomNavigationBarItem(
-          icon: Icon(Icons.shopping_cart),
-          label: '',
-        ),
-        BottomNavigationBarItem(
-          icon: Icon(Icons.account_circle),
-          label: '',
-        ),
-      ],
+      ),
+      child: BottomNavigationBar(
+        currentIndex: currentIndex,
+        onTap: (int i) {
+          _navigateToScreen(context, i, auth);
+        },
+        type: BottomNavigationBarType.fixed,
+        backgroundColor: Globals.primaryColor,
+        selectedItemColor: Globals.redColor,
+        unselectedItemColor: Colors.blueGrey,
+        iconSize: 25.0,
+        selectedFontSize: 14.0,
+        unselectedFontSize: 12.0,
+        items: const [
+          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
+          BottomNavigationBarItem(
+              icon: Icon(Icons.question_answer), label: 'Chat'),
+          BottomNavigationBarItem(
+              icon: Icon(Icons.shopping_cart), label: 'Booking'),
+          BottomNavigationBarItem(
+              icon: Icon(Icons.account_circle), label: 'Profile'),
+        ],
+      ),
     );
+
+    // return BottomNavigationBar(
+    //   currentIndex: currentIndex,
+    //   onTap: (int i) {
+    //     _navigateToScreen(context, i, auth);
+    //   },
+    //   type: BottomNavigationBarType.fixed,
+    //   backgroundColor: Globals.primaryColor,
+    //   selectedItemColor: Globals.redColor,
+    //   unselectedItemColor: Colors.blueGrey,
+    //   iconSize: 25.0,
+    //   selectedFontSize: 14.0,
+    //   unselectedFontSize: 12.0,
+    //   items: const [
+    //     BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
+    //     BottomNavigationBarItem(
+    //         icon: Icon(Icons.question_answer), label: 'Chat'),
+    //     BottomNavigationBarItem(
+    //         icon: Icon(Icons.shopping_cart), label: 'Booking'),
+    //     BottomNavigationBarItem(
+    //         icon: Icon(Icons.account_circle), label: 'Profile'),
+    //   ],
+    // );
   }
 
   // modify the method _getRoutes in main.dart to asscoiate the routes with the index
@@ -52,8 +76,8 @@ class AppBarBack extends StatelessWidget implements PreferredSizeWidget {
         return 0;
       case '/chat':
         return 1;
-      // case '/cart':
-      //   return 2;
+      case '/cart':
+        return 2;
       case '/profile':
         return 3;
       default:
@@ -72,9 +96,9 @@ class AppBarBack extends StatelessWidget implements PreferredSizeWidget {
       case 1:
         newRoute = '/chat';
         break;
-      // case 2:
-      //   newRoute = '/cart';
-      //   break;
+      case 2:
+        newRoute = '/cart';
+        break;
       case 3:
         newRoute = '/profile';
         break;

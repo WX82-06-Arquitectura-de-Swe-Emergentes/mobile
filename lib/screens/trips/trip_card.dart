@@ -3,6 +3,7 @@ import 'package:frontend/models/trip.dart';
 import 'package:frontend/providers/auth_provider.dart';
 import 'package:frontend/shared/globals.dart';
 import 'package:frontend/screens/trips/trip_details.dart';
+import 'package:frontend/utils/global_utils.dart';
 import 'package:intl/intl.dart';
 
 class TripCard extends StatelessWidget {
@@ -13,22 +14,6 @@ class TripCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    String formatPriceToPenTwoDecimals(double price) {
-      if (price % 1 == 0) {
-        return 'S/ ${price.toInt()}';
-      } else {
-        return 'S/ ${price.toStringAsFixed(2)}';
-      }
-    }
-
-    double responsiveValue(double min, double max, int defaultValue) {
-      if (MediaQuery.of(context).size.width < defaultValue) {
-        return min;
-      } else {
-        return max;
-      }
-    }
-
     return InkWell(
       onTap: () async {
         await Future.delayed(Duration.zero, () {
@@ -52,10 +37,22 @@ class TripCard extends StatelessWidget {
                   ClipRRect(
                       borderRadius: BorderRadius.circular(10),
                       child: FadeInImage.assetNetwork(
-                          placeholder: 'images/loading.gif',
-                          width: responsiveValue(100.0, 140.0, 400),
-                          height: responsiveValue(80.0, 120.0, 400),
-                          image: trip.thumbnail)),
+                        placeholder: 'images/loading.gif',
+                        width:
+                            Utils.responsiveValue(context, 100.0, 140.0, 400),
+                        height:
+                            Utils.responsiveValue(context, 80.0, 120.0, 400),
+                        image: trip.thumbnail,
+                        imageErrorBuilder: (context, error, stackTrace) {
+                          return Image.asset(
+                            'https://i.postimg.cc/44WWd61W/placeholder.png',
+                            width: Utils.responsiveValue(
+                                context, 100.0, 140.0, 400),
+                            height: Utils.responsiveValue(
+                                context, 80.0, 120.0, 400),
+                          );
+                        },
+                      )),
                   const SizedBox(width: 16.0),
                   Expanded(
                       child: Column(
@@ -64,19 +61,21 @@ class TripCard extends StatelessWidget {
                       Text(trip.name,
                           style: TextStyle(
                               color: Colors.white,
-                              fontSize: responsiveValue(14.0, 16.0, 400),
+                              fontSize: Utils.responsiveValue(
+                                  context, 14.0, 16.0, 400),
                               fontWeight: FontWeight.bold)),
                       const SizedBox(height: 8.0),
                       Text(trip.destinationName,
                           style: TextStyle(
                               color: Colors.white,
-                              fontSize: responsiveValue(10.0, 12.0, 400))),
+                              fontSize: Utils.responsiveValue(
+                                  context, 10.0, 12.0, 400))),
                     ],
                   ))
                 ],
               ),
               SizedBox(
-                  height: responsiveValue(12.0, 24.0, 400),
+                  height: Utils.responsiveValue(context, 12.0, 24.0, 400),
                   child: const Divider(
                     color: Colors.white10,
                   )),
@@ -90,18 +89,24 @@ class TripCard extends StatelessWidget {
                       Text("Rating",
                           style: TextStyle(
                               color: Colors.white,
-                              fontSize: responsiveValue(12.0, 14.0, 400))),
-                      SizedBox(width: responsiveValue(4.0, 8.0, 400)),
+                              fontSize: Utils.responsiveValue(
+                                  context, 12.0, 14.0, 400))),
+                      SizedBox(
+                          width: Utils.responsiveValue(context, 4.0, 8.0, 400)),
                       Row(
                         children: [
                           Icon(Icons.star,
                               color: Colors.yellow,
-                              size: responsiveValue(16.0, 20.0, 400)),
-                          SizedBox(width: responsiveValue(2.0, 8.0, 400)),
+                              size: Utils.responsiveValue(
+                                  context, 16.0, 20.0, 400)),
+                          SizedBox(
+                              width: Utils.responsiveValue(
+                                  context, 2.0, 8.0, 400)),
                           Text('${trip.averageRating}/5',
                               style: TextStyle(
                                   color: Colors.white,
-                                  fontSize: responsiveValue(12.0, 14.0, 400))),
+                                  fontSize: Utils.responsiveValue(
+                                      context, 12.0, 14.0, 400))),
                         ],
                       ),
                     ],
@@ -113,12 +118,15 @@ class TripCard extends StatelessWidget {
                       Text("Price",
                           style: TextStyle(
                               color: Colors.white,
-                              fontSize: responsiveValue(12.0, 14.0, 400))),
-                      SizedBox(width: responsiveValue(4.0, 8.0, 400)),
-                      Text(formatPriceToPenTwoDecimals(trip.price),
+                              fontSize: Utils.responsiveValue(
+                                  context, 12.0, 14.0, 400))),
+                      SizedBox(
+                          width: Utils.responsiveValue(context, 4.0, 8.0, 400)),
+                      Text(Utils.formatPriceToPenTwoDecimals(trip.price),
                           style: TextStyle(
                               color: Colors.white,
-                              fontSize: responsiveValue(12.0, 14.0, 400))),
+                              fontSize: Utils.responsiveValue(
+                                  context, 12.0, 14.0, 400))),
                     ],
                   ),
                   const Spacer(flex: 1),
@@ -128,8 +136,10 @@ class TripCard extends StatelessWidget {
                       Text("Status",
                           style: TextStyle(
                               color: Colors.white,
-                              fontSize: responsiveValue(12.0, 14.0, 400))),
-                      SizedBox(width: responsiveValue(4.0, 8.0, 400)),
+                              fontSize: Utils.responsiveValue(
+                                  context, 12.0, 14.0, 400))),
+                      SizedBox(
+                          width: Utils.responsiveValue(context, 4.0, 8.0, 400)),
                       Row(
                         children: [
                           Container(
@@ -142,11 +152,14 @@ class TripCard extends StatelessWidget {
                               shape: BoxShape.circle,
                             ),
                           ),
-                          SizedBox(width: responsiveValue(2.0, 8.0, 400)),
+                          SizedBox(
+                              width: Utils.responsiveValue(
+                                  context, 2.0, 8.0, 400)),
                           Text(trip.status == 'A' ? 'Open' : 'Closed',
                               style: TextStyle(
                                   color: Colors.white,
-                                  fontSize: responsiveValue(12.0, 14.0, 400))),
+                                  fontSize: Utils.responsiveValue(
+                                      context, 12.0, 14.0, 400))),
                         ],
                       ),
                     ],
@@ -158,13 +171,16 @@ class TripCard extends StatelessWidget {
                       Text("Date",
                           style: TextStyle(
                               color: Colors.white,
-                              fontSize: responsiveValue(12.0, 14.0, 400))),
-                      SizedBox(width: responsiveValue(4.0, 8.0, 400)),
+                              fontSize: Utils.responsiveValue(
+                                  context, 12.0, 14.0, 400))),
+                      SizedBox(
+                          width: Utils.responsiveValue(context, 4.0, 8.0, 400)),
                       Text(
                           '${DateFormat('dd/MM').format(trip.startDate)} - ${DateFormat('dd/MM').format(trip.endDate)}',
                           style: TextStyle(
                               color: Colors.white,
-                              fontSize: responsiveValue(12.0, 14.0, 400))),
+                              fontSize: Utils.responsiveValue(
+                                  context, 12.0, 14.0, 400))),
                     ],
                   ),
                 ],

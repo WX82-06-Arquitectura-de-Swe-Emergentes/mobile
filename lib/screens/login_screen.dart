@@ -2,6 +2,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:frontend/firebase/notification/push_notifications_service.dart';
 import 'package:frontend/shared/globals.dart';
+import 'package:frontend/utils/global_utils.dart';
 import 'package:provider/provider.dart';
 import 'package:frontend/providers/auth_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -124,178 +125,182 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      resizeToAvoidBottomInset: false,
-      backgroundColor: Globals.primaryColor,
-      body: Padding(
-        padding: EdgeInsets.fromLTRB(
-            MediaQuery.of(context).size.width < 400 ? 32.0 : 64.0,
-            0.0,
-            MediaQuery.of(context).size.width < 400 ? 32.0 : 64.0,
-            32.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: <Widget>[
-            Padding(
-              padding: EdgeInsets.only(
-                  bottom:
-                      MediaQuery.of(context).size.width < 400 ? 16.0 : 32.0),
-              child: const Column(
-                children: [
-                  SizedBox(
-                    height: 90.0,
-                    width: 90.0,
-                    child: Image(image: AssetImage('images/logo.png')),
-                  ),
-                  Text(
-                    'Sign In',
-                    style: TextStyle(
-                      fontSize: 24.0,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
+    return WillPopScope(
+      child: Scaffold(
+        resizeToAvoidBottomInset: false,
+        backgroundColor: Globals.primaryColor,
+        body: Padding(
+          padding: EdgeInsets.fromLTRB(
+              Utils.responsiveValue(context, 32.0, 64.0, 400),
+              0.0,
+              Utils.responsiveValue(context, 32.0, 64.0, 400),
+              32.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: <Widget>[
+              Padding(
+                padding: EdgeInsets.only(
+                    bottom: Utils.responsiveValue(context, 16.0, 32.0, 400)),
+                child: Column(
+                  children: const [
+                    SizedBox(
+                      height: 90.0,
+                      width: 90.0,
+                      child: Image(image: AssetImage('images/logo.png')),
                     ),
+                    Text(
+                      'Sign In',
+                      style: TextStyle(
+                        fontSize: 24.0,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                    ),
+                    SizedBox(height: 14.0),
+                    Text(
+                      'Please login to continue',
+                      style: TextStyle(
+                        fontSize: 14.0,
+                        color: Colors.grey,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              TextFormField(
+                controller: _emailController,
+                decoration: InputDecoration(
+                  filled: true,
+                  fillColor: Colors.white,
+                  enabledBorder: OutlineInputBorder(
+                    borderSide: const BorderSide(color: Colors.grey),
+                    borderRadius: BorderRadius.circular(10),
                   ),
-                  SizedBox(height: 14.0),
-                  Text(
-                    'Please login to continue',
-                    style: TextStyle(
-                      fontSize: 14.0,
+                  focusedBorder: OutlineInputBorder(
+                    borderSide: const BorderSide(color: Colors.blue),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  hintText: 'Email address',
+                  contentPadding: EdgeInsets.symmetric(
+                    vertical: Utils.responsiveValue(context, 10.0, 20.0, 400),
+                    horizontal: Utils.responsiveValue(context, 10.0, 20.0, 400),
+                  ),
+                  hintStyle: TextStyle(
+                    fontSize: Utils.responsiveValue(context, 12.0, 14.0, 400),
+                  ),
+                ),
+              ),
+              if (_formErrors.containsKey('email'))
+                ..._formErrors['email']!
+                    .map((error) => Text(
+                          error,
+                          style: const TextStyle(color: Colors.red),
+                        ))
+                    .toList(),
+              const SizedBox(height: 12.0),
+              TextFormField(
+                controller: _passwordController,
+                decoration: InputDecoration(
+                  filled: true,
+                  fillColor: Colors.white,
+                  enabledBorder: OutlineInputBorder(
+                    borderSide: const BorderSide(color: Colors.grey),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderSide: const BorderSide(color: Colors.blue),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  hintText: 'Password',
+                  contentPadding: EdgeInsets.symmetric(
+                    vertical: Utils.responsiveValue(context, 10.0, 20.0, 400),
+                    horizontal: Utils.responsiveValue(context, 10.0, 20.0, 400),
+                  ),
+                  hintStyle: TextStyle(
+                    fontSize: Utils.responsiveValue(context, 12.0, 14.0, 400),
+                  ),
+                  suffixIcon: IconButton(
+                    icon: Icon(
+                      _obscurePassword
+                          ? Icons.visibility_off
+                          : Icons.visibility,
                       color: Colors.grey,
                     ),
-                  ),
-                ],
-              ),
-            ),
-            TextFormField(
-              controller: _emailController,
-              decoration: InputDecoration(
-                filled: true,
-                fillColor: Colors.white,
-                enabledBorder: OutlineInputBorder(
-                  borderSide: const BorderSide(color: Colors.grey),
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderSide: const BorderSide(color: Colors.blue),
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                hintText: 'Email address',
-                contentPadding: EdgeInsets.symmetric(
-                  vertical: MediaQuery.of(context).size.width < 400 ? 10 : 20,
-                  horizontal: MediaQuery.of(context).size.width < 400 ? 10 : 20,
-                ),
-                hintStyle: TextStyle(
-                  fontSize: MediaQuery.of(context).size.width < 400 ? 12 : 14,
-                ),
-              ),
-            ),
-            if (_formErrors.containsKey('email'))
-              ..._formErrors['email']!
-                  .map((error) => Text(
-                        error,
-                        style: const TextStyle(color: Colors.red),
-                      ))
-                  .toList(),
-            const SizedBox(height: 12.0),
-            TextFormField(
-              controller: _passwordController,
-              decoration: InputDecoration(
-                filled: true,
-                fillColor: Colors.white,
-                enabledBorder: OutlineInputBorder(
-                  borderSide: const BorderSide(color: Colors.grey),
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderSide: const BorderSide(color: Colors.blue),
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                hintText: 'Password',
-                contentPadding: EdgeInsets.symmetric(
-                  vertical: MediaQuery.of(context).size.width < 400 ? 10 : 20,
-                  horizontal: MediaQuery.of(context).size.width < 400 ? 10 : 20,
-                ),
-                hintStyle: TextStyle(
-                  fontSize: MediaQuery.of(context).size.width < 400 ? 12 : 14,
-                ),
-                suffixIcon: IconButton(
-                  icon: Icon(
-                    _obscurePassword ? Icons.visibility_off : Icons.visibility,
-                    color: Colors.grey,
-                  ),
-                  onPressed: () {
-                    setState(() {
-                      _obscurePassword = !_obscurePassword;
-                    });
-                  },
-                ),
-              ),
-              obscureText: _obscurePassword,
-            ),
-            if (_formErrors.containsKey('password'))
-              ..._formErrors['password']!
-                  .map((error) => Text(
-                        error,
-                        style: const TextStyle(color: Colors.red),
-                      ))
-                  .toList(),
-            //Recordar Usuario
-            const SizedBox(height: 5.0),
-            Row(
-              children: [
-                Checkbox(
-                  value: _rememberUser,
-                  onChanged: (value) {
-                    setState(() {
-                      _rememberUser = value!;
-                    });
-                  },
-                  visualDensity: VisualDensity.compact,
-                  fillColor:
-                      MaterialStateColor.resolveWith((states) => Colors.white),
-                  checkColor: Colors.red,
-                ),
-                const Text(
-                  'Guardar mis credenciales',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 14.0,
+                    onPressed: () {
+                      setState(() {
+                        _obscurePassword = !_obscurePassword;
+                      });
+                    },
                   ),
                 ),
-              ],
-            ),
-            ElevatedButton(
-              onPressed: _isLoading ? null : _handleLogin,
-              child: _isLoading
-                  ? const CircularProgressIndicator()
-                  : const Text('Login to your account'),
-            ),
-            const SizedBox(height: 16.0),
-            RichText(
-              textAlign: TextAlign.center,
-              text: TextSpan(
-                text: "Dont' have an account? ",
-                style: const TextStyle(color: Colors.white),
-                children: <TextSpan>[
-                  TextSpan(
-                    text: 'Sign up',
-                    style: const TextStyle(
-                      color: Colors.red,
-                      fontWeight: FontWeight.bold,
+                obscureText: _obscurePassword,
+              ),
+              if (_formErrors.containsKey('password'))
+                ..._formErrors['password']!
+                    .map((error) => Text(
+                          error,
+                          style: const TextStyle(color: Colors.red),
+                        ))
+                    .toList(),
+              //Recordar Usuario
+              const SizedBox(height: 5.0),
+              Row(
+                children: [
+                  Checkbox(
+                    value: _rememberUser,
+                    onChanged: (value) {
+                      setState(() {
+                        _rememberUser = value!;
+                      });
+                    },
+                    visualDensity: VisualDensity.compact,
+                    fillColor: MaterialStateColor.resolveWith(
+                        (states) => Colors.white),
+                    checkColor: Colors.red,
+                  ),
+                  const Text(
+                    'Guardar mis credenciales',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 14.0,
                     ),
-                    recognizer: TapGestureRecognizer()
-                      ..onTap = () {
-                        // Lógica del enlace aquí
-                        Navigator.of(context).pushNamed('/signup');
-                      },
                   ),
                 ],
               ),
-            ),
-          ],
+              ElevatedButton(
+                onPressed: _isLoading ? null : _handleLogin,
+                child: _isLoading
+                    ? const CircularProgressIndicator()
+                    : const Text('Login to your account'),
+              ),
+              const SizedBox(height: 16.0),
+              RichText(
+                textAlign: TextAlign.center,
+                text: TextSpan(
+                  text: "Dont' have an account? ",
+                  style: const TextStyle(color: Colors.white),
+                  children: <TextSpan>[
+                    TextSpan(
+                      text: 'Sign up',
+                      style: const TextStyle(
+                        color: Colors.red,
+                        fontWeight: FontWeight.bold,
+                      ),
+                      recognizer: TapGestureRecognizer()
+                        ..onTap = () {
+                          // Lógica del enlace aquí
+                          Navigator.of(context).pushNamed('/signup');
+                        },
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
         ),
       ),
+      onWillPop: () async => false,
     );
   }
 }

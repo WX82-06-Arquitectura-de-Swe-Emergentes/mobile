@@ -26,7 +26,6 @@ class _ChatListScreenState extends State<ChatListScreen> {
   late AuthenticationProvider authProvider;
   bool _isLoading = true;
 
-
   @override
   void initState() {
     super.initState();
@@ -35,7 +34,11 @@ class _ChatListScreenState extends State<ChatListScreen> {
       listen: false,
     );
     chats = [];
-    _loadChatsForMember();
+    _loadChatsForMember().then((value) {
+      setState(() {
+        _isLoading = false;
+      });
+    });
   }
 
   Future<void> _loadChatsForMember() async {
@@ -61,15 +64,14 @@ class _ChatListScreenState extends State<ChatListScreen> {
         _chats.add(chatCopy.toJson());
       }
     });
-    setStateIfMounted(_chats);
-
+    if (mounted) {
+      setState(() {
+        chats = _chats;
+      });
+    }
     for (final chat in chats) {
       _listenForChatUpdates(chat['id']);
     }
-
-    setState(() {
-      _isLoading = false;
-    });
   }
 
   void _listenForChatUpdates(String chatId) {
@@ -77,28 +79,13 @@ class _ChatListScreenState extends State<ChatListScreen> {
     chatRef.onValue.listen((event) {
       final chatIndex = chats.indexWhere((chat) => chat['id'] == chatId);
       if (chatIndex != -1) {
-        // setState(() {
-        //   chats[chatIndex] = event.snapshot.value as Map<dynamic, dynamic>;
-        // });
-        setStateIfMountedIndex(event.snapshot.value as Map<dynamic, dynamic>,chatIndex);
+        if (mounted) {
+          setState(() {
+            chats[chatIndex] = event.snapshot.value as Map<dynamic, dynamic>;
+          });
+        }
       }
     });
-  }
-
-  void setStateIfMounted(f) {
-    if (mounted) {
-      setState(() {
-        chats = f;
-      });
-    }
-  }
-
-  void setStateIfMountedIndex(f, index) {
-    if (mounted) {
-      setState(() {
-        chats[index] = f;
-      });
-    }
   }
 
   @override

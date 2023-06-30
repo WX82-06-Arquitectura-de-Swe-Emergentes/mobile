@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/firebase/notification/push_notifications_service.dart';
 import 'package:frontend/providers/auth_provider.dart';
+import 'package:frontend/providers/booking_provider.dart';
 import 'package:frontend/providers/destination_provider.dart';
 import 'package:frontend/providers/season_provider.dart';
 import 'package:frontend/providers/trip_provider.dart';
+import 'package:frontend/screens/cart/cart_screen.dart';
 import 'package:frontend/screens/chats/chat_list_screen.dart';
 import 'package:frontend/screens/login_screen.dart';
 import 'package:frontend/screens/profile/profile_screen.dart';
@@ -26,6 +28,7 @@ Future<void> main() async {
       ChangeNotifierProvider<AuthenticationProvider>(
         create: (_) => AuthenticationProvider(),
       ),
+      ChangeNotifierProvider<BookingProvider>(create: (_) => BookingProvider()),
       ChangeNotifierProvider<TripProvider>(create: (_) => TripProvider()),
       ChangeNotifierProvider<SeasonProvider>(create: (_) => SeasonProvider()),
       ChangeNotifierProvider<DestinationProvider>(
@@ -40,8 +43,9 @@ Map<String, WidgetBuilder> _getRoutes() {
     '/signin': (context) => const LoginScreen(),
     '/signup': (context) => const RegisterScreen(),
     '/trip': (context) => const TripScreen(),
-    '/chat':(context) => const ChatListScreen(),
-    '/profile':(context) => const ProfileScreen(),
+    '/chat': (context) => const ChatListScreen(),
+    '/cart': (context) => const CartScreen(),
+    '/profile': (context) => const ProfileScreen(),
   };
 }
 

@@ -7,8 +7,8 @@ class Filter {
   Filter({
     this.destination,
     this.season,
-    this.minPrice = 0,
-    this.maxPrice = 9999.99,
+    required this.minPrice,
+    required this.maxPrice,
   });
 
   Map<String, dynamic> toJson() => {

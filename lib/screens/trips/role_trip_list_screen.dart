@@ -5,16 +5,16 @@ import 'package:frontend/screens/trips/trip_card.dart';
 import 'package:frontend/utils/global_utils.dart';
 import 'package:provider/provider.dart';
 
-class TripListScreen extends StatefulWidget {
-  const TripListScreen({Key? key}) : super(key: key);
+class RoleTripListScreen extends StatefulWidget {
+  const RoleTripListScreen({Key? key}) : super(key: key);
 
   @override
-  State<TripListScreen> createState() {
-    return _TripListScreenState();
+  State<RoleTripListScreen> createState() {
+    return _RoleTripListScreenState();
   }
 }
 
-class _TripListScreenState extends State<TripListScreen> {
+class _RoleTripListScreenState extends State<RoleTripListScreen> {
   final isLoading = ValueNotifier<bool>(true);
   late TripProvider tripProvider;
   late AuthenticationProvider authProvider;
@@ -25,14 +25,14 @@ class _TripListScreenState extends State<TripListScreen> {
     tripProvider = Provider.of<TripProvider>(context, listen: false);
     authProvider = Provider.of<AuthenticationProvider>(context, listen: false);
 
-    loadData().then((value) {
+    getData().then((value) {
       setStateIfMounted(false);
     });
   }
 
-  Future<void> loadData() async {
+  Future<void> getData() async {
     if (tripProvider.trips.isEmpty) {
-      await tripProvider.getTrips(authProvider.token, null);
+      await tripProvider.getTripsByRoleViaToken(authProvider.token, null);
     }
   }
 
@@ -57,7 +57,8 @@ class _TripListScreenState extends State<TripListScreen> {
           return RefreshIndicator(
             onRefresh: () async {
               setStateIfMounted(true);
-              await tripProvider.getTrips(authProvider.token, null);
+              await tripProvider.getTripsByRoleViaToken(
+                  authProvider.token, null);
               setStateIfMounted(false);
             },
             child: tripProvider.trips.isEmpty
@@ -70,10 +71,10 @@ class _TripListScreenState extends State<TripListScreen> {
                     padding: EdgeInsets.all(
                         Utils.responsiveValue(context, 8.0, 16.0, 400)),
                     itemBuilder: (ct, i) => TripCard(
-                        trip: tripProvider.getTrip(i), auth: authProvider),
+                        trip: tripProvider.trips[i], auth: authProvider),
                     separatorBuilder: (_, __) => SizedBox(
                         height: Utils.responsiveValue(context, 8.0, 16.0, 400)),
-                    itemCount: tripProvider.size,
+                    itemCount: tripProvider.trips.length,
                   ),
           );
         }

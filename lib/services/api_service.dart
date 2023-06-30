@@ -7,7 +7,7 @@ class ApiService {
 
   static Future<dynamic> get(
       String endpoint, Map<String, String>? headers) async {
-        print(Uri.parse(baseUrl + endpoint));
+    print(Uri.parse(baseUrl + endpoint));
     final response =
         await http.get(Uri.parse(baseUrl + endpoint), headers: headers);
     if (response.statusCode == 200) {
@@ -21,13 +21,11 @@ class ApiService {
       Map<String, dynamic>? body) async {
     final response = await http.post(Uri.parse(baseUrl + endpoint),
         headers: headers, body: jsonEncode(body));
-
     return response;
   }
 
   static Future<dynamic> patch(String endpoint, Map<String, String>? headers,
       Map<String, dynamic>? body) async {
-
     final response = await http.patch(Uri.parse(baseUrl + endpoint),
         headers: headers, body: jsonEncode(body));
     return response;

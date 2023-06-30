@@ -14,6 +14,14 @@ class AuthenticationProvider extends ChangeNotifier {
 
   final _authenticationService = AuthenticationService();
 
+  bool isAgency() {
+    return _role == "AGENCY";
+  }
+
+  bool isTraveler() {
+    return _role == "TRAVELER";
+  }
+
   Future<dynamic> signIn(String email, String password) async {
     final response = await _authenticationService.signIn(email, password);
 
