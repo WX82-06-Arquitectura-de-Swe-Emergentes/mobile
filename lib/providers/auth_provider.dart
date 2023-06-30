@@ -102,6 +102,22 @@ class AuthenticationProvider extends ChangeNotifier {
     }
   }
 
+  Future<dynamic> updateEmail(String currentEmail, String newEmail) async {
+    final response =
+        await _authenticationService.updateEmail(currentEmail, newEmail);
+
+    if (response.statusCode == 200) {
+      return;
+    } else {
+      final jsonBody = jsonDecode(response.body);
+      throw ApiException(message: jsonBody['message']);
+    }
+  }
+
+  String getUsername() {
+    return _username;
+  }
+
   void signOut() {
     _token = null;
     notifyListeners();

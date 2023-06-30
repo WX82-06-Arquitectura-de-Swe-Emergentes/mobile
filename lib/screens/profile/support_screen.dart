@@ -185,23 +185,28 @@ class FAQItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ExpansionTile(
-      title: Text(
-        question,
-        style: const TextStyle(
-          color: Colors.white,
-          fontSize: 15,
-        ),
+    return Theme(
+      data: Theme.of(context).copyWith(
+        unselectedWidgetColor: Colors.red,
       ),
-      children: [
-        Padding(
-          padding: const EdgeInsets.symmetric(vertical: 8.0),
-          child: Text(
-            answer,
-            style: const TextStyle(color: Colors.white),
+      child: ExpansionTile(
+        title: Text(
+          question,
+          style: const TextStyle(
+            color: Colors.white,
+            fontSize: 15,
           ),
         ),
-      ],
+        children: [
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 8.0),
+            child: Text(
+              answer,
+              style: const TextStyle(color: Colors.white),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

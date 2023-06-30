@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/providers/auth_provider.dart';
 import 'package:frontend/shared/globals.dart';
 
 class AccountSettingScreen extends StatefulWidget {
@@ -10,7 +11,11 @@ class AccountSettingScreen extends StatefulWidget {
 }
 
 class _AccountSettingScreenState extends State<AccountSettingScreen> {
+  final authProvider = AuthenticationProvider();
   final _formKey = GlobalKey<FormState>(); // Clave para el formulario
+
+  final TextEditingController _oldEmailController = TextEditingController();
+  final TextEditingController _newEmailController = TextEditingController();
   TextEditingController _emailController = TextEditingController();
   TextEditingController _oldPasswordController = TextEditingController();
   TextEditingController _newPasswordController = TextEditingController();
@@ -151,17 +156,42 @@ class _AccountSettingScreenState extends State<AccountSettingScreen> {
 
   void _submitForm() {
     if (_formKey.currentState!.validate()) {
-      String email = _emailController.text;
-      String oldPassword = _oldPasswordController.text;
-      String newPassword = _newPasswordController.text;
-      String confirmPassword = _confirmPasswordController.text;
-      // operaciones necesarias para actualizar los datos de la cuenta
+      String oldEmail = _oldEmailController.text;
+      String newEmail = _newEmailController.text;
+      //String mobileToken = PushNotificationService.tokenValue;
 
-      // Mostrar una notificación o realizar alguna acción adicional
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('¡Datos actualizados correctamente!')),
-      );
+      try {
+        authProvider.updateEmail(oldEmail, newEmail);
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('¡Datos actualizados correctamente!')),
+        );
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error al actualizar los datos: $e')),
+        );
+      }
     }
+  }
+
+  void _recoverPassword(String email) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Email Sent'),
+          content: const Text(
+              'Se ha enviado un correo electrónico con instrucciones para restablecer la contraseña a su dirección de correo electrónico.'),
+          actions: [
+            TextButton(
+              child: const Text('OK'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override
@@ -181,7 +211,7 @@ class _AccountSettingScreenState extends State<AccountSettingScreen> {
                 TextFormField(
                   controller: _emailController,
                   decoration: const InputDecoration(
-                    labelText: 'Correo electrónico',
+                    labelText: 'Correo electrónico Actual',
                     labelStyle: TextStyle(color: Colors.grey),
                     enabledBorder: UnderlineInputBorder(
                       borderSide: BorderSide(color: Colors.white),
@@ -190,17 +220,18 @@ class _AccountSettingScreenState extends State<AccountSettingScreen> {
                       borderSide: BorderSide(color: Colors.white),
                     ),
                   ),
+                  style: const TextStyle(color: Colors.white),
                   validator: (value) {
                     if (value!.isEmpty) {
-                      return 'Por favor, ingresa tu correo electrónico';
+                      return 'Por favor, ingresa tu correo electrónico Actual';
                     }
                     return null;
                   },
                 ),
                 TextFormField(
-                  controller: _oldPasswordController,
+                  controller: _newEmailController,
                   decoration: const InputDecoration(
-                    labelText: 'Password actual',
+                    labelText: 'Nuevo correo Electrónico',
                     labelStyle: TextStyle(color: Colors.grey),
                     enabledBorder: UnderlineInputBorder(
                       borderSide: BorderSide(color: Colors.white),
@@ -209,14 +240,12 @@ class _AccountSettingScreenState extends State<AccountSettingScreen> {
                       borderSide: BorderSide(color: Colors.white),
                     ),
                   ),
+                  style: const TextStyle(color: Colors.white),
                   validator: (value) {
                     if (value!.isEmpty) {
-                      return 'Por favor, ingresa tu password';
+                      return 'Por favor, ingresa tu nuevo correo electrónico';
                     }
                     return null;
-                  },
-                  onTap: () {
-                    _showChangePasswordDialog();
                   },
                 ),
                 const SizedBox(height: 16.0),
@@ -247,24 +276,7 @@ class _AccountSettingScreenState extends State<AccountSettingScreen> {
                               onPressed: () {
                                 // TODO: Implement password recovery logic
                                 Navigator.of(context).pop();
-                                showDialog(
-                                  context: context,
-                                  builder: (BuildContext context) {
-                                    return AlertDialog(
-                                      title: const Text('Email Sent'),
-                                      content: const Text(
-                                          'Se ha enviado un correo electrónico con instrucciones para restablecer la contraseña a su dirección de correo electrónico.'),
-                                      actions: [
-                                        TextButton(
-                                          child: const Text('OK'),
-                                          onPressed: () {
-                                            Navigator.of(context).pop();
-                                          },
-                                        ),
-                                      ],
-                                    );
-                                  },
-                                );
+                                _recoverPassword(_emailController.text);
                               },
                             ),
                           ],
@@ -273,13 +285,6 @@ class _AccountSettingScreenState extends State<AccountSettingScreen> {
                     );
                   },
                   child: const Text('Recover Password'),
-                ),
-                const SizedBox(height: 16.0),
-                TextButton(
-                  onPressed: () {
-                    _showDeleteAccountDialog();
-                  },
-                  child: const Text('Delete Account'),
                 ),
               ],
             ),
