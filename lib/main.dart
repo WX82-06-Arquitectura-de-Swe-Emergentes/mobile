@@ -6,6 +6,7 @@ import 'package:frontend/providers/destination_provider.dart';
 import 'package:frontend/providers/season_provider.dart';
 import 'package:frontend/providers/trip_provider.dart';
 import 'package:frontend/screens/cart/cart_screen.dart';
+import 'package:frontend/screens/chats/chat_conversation_screen.dart';
 import 'package:frontend/screens/chats/chat_list_screen.dart';
 import 'package:frontend/screens/login_screen.dart';
 import 'package:frontend/screens/profile/profile_screen.dart';
@@ -16,11 +17,11 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
 
 Future<void> main() async {
-
   WidgetsFlutterBinding.ensureInitialized();
   PushNotificationService.initializeApp();
 
-  Stripe.publishableKey = "pk_test_51NEOG0BCaaBopW0JuSz4FUfcLLCJ4jSJw4xEn1EihJEwzVff4e19mGmo8dMnS9WeUxEFb8sSIoxnEeKrsfNT1YSN002vyYOYkQ";
+  Stripe.publishableKey =
+      "pk_test_51NEOG0BCaaBopW0JuSz4FUfcLLCJ4jSJw4xEn1EihJEwzVff4e19mGmo8dMnS9WeUxEFb8sSIoxnEeKrsfNT1YSN002vyYOYkQ";
   await dotenv.load(fileName: "assets/.env");
 
   runApp(MultiProvider(
@@ -59,11 +60,10 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-
   @override
   void initState() {
     super.initState();
-    
+
     // Tenemos acceso al context
     PushNotificationService.messagesStream.listen((message) {
       print("Message $message");
@@ -76,8 +76,9 @@ class _MyAppState extends State<MyApp> {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'Flutter Demo',
-      theme: ThemeData(primarySwatch: Colors.red,fontFamily: 'NunitoSans_10pt'),
+      title: 'AdventureHub',
+      theme:
+          ThemeData(primarySwatch: Colors.red, fontFamily: 'NunitoSans_10pt'),
       initialRoute: '/signin',
       routes: _getRoutes(),
     );

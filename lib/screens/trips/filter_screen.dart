@@ -12,10 +12,10 @@ import 'package:provider/provider.dart';
 
 class FilterScreen extends StatefulWidget {
   const FilterScreen(
-      {Key? key, required this.token, required this.filterCallback})
+      {Key? key, required this.token, required this.currentIndex})
       : super(key: key);
   final String? token;
-  final Function filterCallback;
+  final dynamic currentIndex;
 
   @override
   State<FilterScreen> createState() {
@@ -24,7 +24,7 @@ class FilterScreen extends StatefulWidget {
 }
 
 const double minPrice = 0;
-const double maxPrice = 5000;
+const double maxPrice = 8000;
 
 class _FilterScreenState extends State<FilterScreen> {
   RangeValues _currentRangeValues = const RangeValues(minPrice, maxPrice);
@@ -40,8 +40,6 @@ class _FilterScreenState extends State<FilterScreen> {
   @override
   void initState() {
     super.initState();
-
-    // widget.filterCallback();
 
     destinationProvider = Provider.of<DestinationProvider>(
       context,
@@ -77,6 +75,8 @@ class _FilterScreenState extends State<FilterScreen> {
     );
   }
 
+  void setFilterCallback(int currentIndex) {}
+
   Future loadDestinations() async {
     if (destinationProvider.destination.isEmpty) {
       return await destinationProvider.getDestinations(widget.token);
@@ -101,7 +101,11 @@ class _FilterScreenState extends State<FilterScreen> {
       maxPrice: _currentRangeValues.end,
     );
 
-    widget.filterCallback(widget.token, filters);
+    if (widget.currentIndex == 0) {
+      tripProvider.getTrips(widget.token, filters);
+    } else {
+      tripProvider.getTripsByRoleViaToken(widget.token, filters);
+    }
 
     Navigator.of(context).pop();
   }
@@ -129,7 +133,7 @@ class _FilterScreenState extends State<FilterScreen> {
                   setState(() {
                     _selectedDestination = null;
                     _selectedSeason = null;
-                    _currentRangeValues = const RangeValues(0, 10000);
+                    _currentRangeValues = const RangeValues(minPrice, maxPrice);
                   });
                 },
                 child: const Text(

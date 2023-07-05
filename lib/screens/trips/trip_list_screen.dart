@@ -16,21 +16,20 @@ class TripListScreen extends StatefulWidget {
 
 class _TripListScreenState extends State<TripListScreen> {
   final isLoading = ValueNotifier<bool>(true);
-  late TripProvider tripProvider;
-  late AuthenticationProvider authProvider;
 
   @override
   void initState() {
     super.initState();
-    tripProvider = Provider.of<TripProvider>(context, listen: false);
-    authProvider = Provider.of<AuthenticationProvider>(context, listen: false);
-
     loadData().then((value) {
       setStateIfMounted(false);
     });
   }
 
   Future<void> loadData() async {
+    final tripProvider = Provider.of<TripProvider>(context, listen: false);
+    final authProvider =
+        Provider.of<AuthenticationProvider>(context, listen: false);
+
     if (tripProvider.trips.isEmpty) {
       await tripProvider.getTrips(authProvider.token, null);
     }
@@ -46,6 +45,9 @@ class _TripListScreenState extends State<TripListScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final tripProvider = Provider.of<TripProvider>(context);
+    final authProvider = Provider.of<AuthenticationProvider>(context);
+
     return ValueListenableBuilder<bool>(
       valueListenable: isLoading,
       builder: (ct, value, _) {

@@ -9,15 +9,12 @@ import 'package:frontend/firebase/notification/push_notifications_service.dart';
 import 'package:frontend/providers/auth_provider.dart';
 import 'package:frontend/shared/globals.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 
 class ChatConversationScreen extends StatefulWidget {
-  const ChatConversationScreen({
-    Key? key,
-    required this.chat,
-    required this.auth,
-  }) : super(key: key);
-  final dynamic chat;
-  final AuthenticationProvider auth;
+  const ChatConversationScreen({Key? key, required this.chatTitle, required this.id}) : super(key: key);
+  final String id;
+  final String chatTitle;
 
   @override
   State<ChatConversationScreen> createState() {
@@ -31,7 +28,21 @@ class _ChatConversationScreenState extends State<ChatConversationScreen> {
   final chatDao = ChatDao();
   final memberDao = MemberDao();
   final messageDao = MessageDao();
+
+  late AuthenticationProvider authProvider;
   late dynamic messages;
+
+  @override
+  void initState() {
+    super.initState();
+    authProvider = Provider.of<AuthenticationProvider>(
+      context,
+      listen: false,
+    );
+
+    messages = [];
+    _loadMessagesFromChat();
+  }
 
   void setStateIfMounted(f) {
     if (mounted) {
@@ -40,6 +51,39 @@ class _ChatConversationScreenState extends State<ChatConversationScreen> {
       });
     }
   }
+
+  // Future<void> _loadMetadataFromChatId() async {
+  //   final _chats = <Map<dynamic, dynamic>>[];
+  //   final memberQuery = memberDao
+  //       .getMemberQuery()
+  //       .orderByChild(authProvider.username)
+  //       .equalTo(true);
+  //   final DatabaseEvent memberSnapshot = await memberQuery.once();
+  //   if (memberSnapshot.snapshot.value == null) {
+  //     return;
+  //   }
+
+  //   final json = memberSnapshot.snapshot.value as Map<dynamic, dynamic>;
+  //   final memberChatsIds = json.keys.toList();
+
+  //   final chatQuery = chatDao.getChatQuery();
+  //   final chatSnapshot = await chatQuery.once();
+  //   final chatJson = chatSnapshot.snapshot.value as Map<dynamic, dynamic>;
+  //   chatJson.forEach((key, value) {
+  //     if (memberChatsIds.contains(key)) {
+  //       Chat chatCopy = Chat.fromJson(value);
+  //       _chats.add(chatCopy.toJson());
+  //     }
+  //   });
+  //   if (mounted) {
+  //     setState(() {
+  //       chats = _chats;
+  //     });
+  //   }
+  //   for (final chat in chats) {
+  //     _listenForChatUpdates(chat['id']);
+  //   }
+  // }
 
   void _loadMessagesFromChat() async {
     Query query = FirebaseDatabase.instance
@@ -51,8 +95,8 @@ class _ChatConversationScreenState extends State<ChatConversationScreen> {
       final json = event.snapshot.value as Map<dynamic, dynamic>;
 
       var _messages = {};
-      if (json.containsKey(widget.chat.id)) {
-        _messages = json[widget.chat.id] as Map<dynamic, dynamic>;
+      if (json.containsKey(widget.id)) {
+        _messages = json[widget.id] as Map<dynamic, dynamic>;
         setStateIfMounted(_messages.values.toList()
           ..sort((a, b) => a['timestamp'].compareTo(b['timestamp'])));
       } else {
@@ -61,9 +105,9 @@ class _ChatConversationScreenState extends State<ChatConversationScreen> {
     });
   }
 
-  Future<String> _findReceptor(String chatId) async {
-    final emisor = widget.auth.username;
-    final memberQuery = memberDao.getMemberRef().child(chatId);
+  Future<String> _findReceptor(String? chatId) async {
+    final emisor = authProvider.username;
+    final memberQuery = memberDao.getMemberRef().child(chatId!);
     final memberSnapshot = await memberQuery.once();
     final json = memberSnapshot.snapshot.value as Map<dynamic, dynamic>;
     final receptor = json.keys.toList().firstWhere((key) => key != emisor);
@@ -75,7 +119,7 @@ class _ChatConversationScreenState extends State<ChatConversationScreen> {
       title: 'New message',
       body: 'You have a new message',
     );
-    final String to = await _findReceptor(widget.chat.id);
+    final String to = await _findReceptor(widget.id);
     final PushNotificationRequest request = PushNotificationRequest(
       notification: customNotification,
       data: null,
@@ -95,16 +139,16 @@ class _ChatConversationScreenState extends State<ChatConversationScreen> {
     final messageText = _textController.text.trim();
     if (messageText.isNotEmpty) {
       Message newMessage = Message(
-        name: widget.auth.username,
+        name: authProvider.username,
         message: messageText,
         timestamp: DateTime.now().millisecondsSinceEpoch,
       );
 
-      messageDao.saveMessage(widget.chat.id, newMessage);
+      messageDao.saveMessage(widget.id, newMessage);
       DatabaseReference chatRef =
           FirebaseDatabase.instance.ref().child('chats');
 
-      chatRef.child(widget.chat.id).update({
+      chatRef.child(widget.id).update({
         "lastMessage": newMessage.message,
         "timestamp": newMessage.timestamp,
       });
@@ -120,18 +164,11 @@ class _ChatConversationScreenState extends State<ChatConversationScreen> {
   }
 
   @override
-  void initState() {
-    super.initState();
-    messages = [];
-    _loadMessagesFromChat();
-  }
-
-  @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Globals.backgroundColor,
       appBar: AppBar(
-        title: Text("${widget.chat.title} chat"),
+        title: Text("Chat"),
       ),
       body: Column(
         children: [
@@ -144,7 +181,7 @@ class _ChatConversationScreenState extends State<ChatConversationScreen> {
                 final messageText = messageData['message'] as String;
                 final timestamp =
                     formatTimestampToHour(messageData['timestamp'] as int);
-                final isMe = name == widget.auth.username;
+                final isMe = name == authProvider.username;
 
                 return Row(
                   mainAxisAlignment:

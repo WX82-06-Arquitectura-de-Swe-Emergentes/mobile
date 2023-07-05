@@ -49,6 +49,10 @@ class ItineraryItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    for (final activity in itinerary.activities) {
+      print(activity.toString());
+    }
+
     Future<void> openMap(
         String location, double latitude, double longitude) async {
       await Navigator.push(

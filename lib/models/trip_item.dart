@@ -143,6 +143,11 @@ class Activity {
     required this.description,
   });
 
+  @override
+  String toString() {
+    return 'Activity{id: $id, name: $name, description: $description}';
+  }
+
   factory Activity.fromJson(Map<String, dynamic> json) => Activity(
         id: json["id"],
         name: json["name"],

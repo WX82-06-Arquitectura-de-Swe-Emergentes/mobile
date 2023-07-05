@@ -90,11 +90,6 @@ class _ChatListScreenState extends State<ChatListScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final authProvider = Provider.of<AuthenticationProvider>(
-      context,
-      listen: false,
-    );
-
     return Scaffold(
       bottomNavigationBar: const AppBarBack(),
       backgroundColor: Globals.backgroundColor,
@@ -146,8 +141,8 @@ class _ChatListScreenState extends State<ChatListScreen> {
                         context,
                         MaterialPageRoute(
                           builder: (context) => ChatConversationScreen(
-                            chat: Chat.fromJson(conversation),
-                            auth: authProvider,
+                            chatTitle: conversation['title'],
+                            id: conversation['id'],
                           ),
                         ),
                       );

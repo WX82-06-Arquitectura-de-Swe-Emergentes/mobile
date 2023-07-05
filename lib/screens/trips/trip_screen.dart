@@ -20,33 +20,13 @@ class TripScreen extends StatefulWidget {
 
 class _TripScreenState extends State<TripScreen>
     with SingleTickerProviderStateMixin {
-  late TripProvider tripProvider;
-  late AuthenticationProvider authProvider;
   late TabController _controller;
   int _selectedIndex = 0;
-  Function filterCallback = () {};
-
-  void setFilterCallback(int currentIndex) {
-    if (currentIndex == 0) {
-      filterCallback = tripProvider.getTrips;
-    } else {
-      filterCallback = tripProvider.getTripsByRoleViaToken;
-    }
-  }
-
-  String welcomeMessage() {
-    if (authProvider.isAgency()) {
-      return "Welcome ${authProvider.username}, manage your trips here.";
-    } else {
-      return "Welcome ${authProvider.username}, looking for a trip?";
-    }
-  }
 
   @override
   void initState() {
     super.initState();
-    tripProvider = Provider.of<TripProvider>(context, listen: false);
-    authProvider = Provider.of<AuthenticationProvider>(context, listen: false);
+    final tripProvider = Provider.of<TripProvider>(context, listen: true);
 
     _controller = TabController(length: 2, vsync: this);
 
@@ -55,7 +35,6 @@ class _TripScreenState extends State<TripScreen>
         _selectedIndex = _controller.index;
       });
       tripProvider.resetData();
-      setFilterCallback(_controller.index);
       print("Selected Index: " + _controller.index.toString());
     });
   }
@@ -68,6 +47,16 @@ class _TripScreenState extends State<TripScreen>
 
   @override
   Widget build(BuildContext context) {
+    final authProvider = Provider.of<AuthenticationProvider>(context);
+
+    String welcomeMessage() {
+      if (authProvider.isAgency()) {
+        return "Welcome ${authProvider.username}, manage your trips here.";
+      } else {
+        return "Welcome ${authProvider.username}, looking for a trip?";
+      }
+    }
+
     List<Widget> tabsByRole() {
       List<Widget> tabs = [];
       if (authProvider.isAgency()) {
@@ -136,7 +125,7 @@ class _TripScreenState extends State<TripScreen>
                   MaterialPageRoute(
                     builder: (context) => FilterScreen(
                         token: authProvider.token,
-                        filterCallback: filterCallback),
+                        currentIndex: _controller.index),
                   ),
                 );
               },
@@ -145,10 +134,7 @@ class _TripScreenState extends State<TripScreen>
         ),
         body: TabBarView(
           controller: _controller,
-          children: const [
-             TripListScreen(),
-             RoleTripListScreen()
-          ],
+          children: const [TripListScreen(), RoleTripListScreen()],
         ),
       ),
     );

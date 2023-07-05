@@ -6,6 +6,7 @@ import 'package:frontend/firebase/member/member_dao.dart';
 import 'package:frontend/models/trip_item.dart';
 import 'package:frontend/providers/auth_provider.dart';
 import 'package:frontend/providers/booking_provider.dart';
+import 'package:frontend/screens/chats/chat_conversation_screen.dart';
 import 'package:frontend/services/trip_service.dart';
 import 'package:frontend/shared/globals.dart';
 import 'package:frontend/utils/global_utils.dart';
@@ -40,6 +41,7 @@ class _TripDetailsScreenState extends State<TripDetailsScreen> {
   MemberDao memberDao = MemberDao();
   late Map<String, dynamic>? paymentIntent;
   late BookingProvider bookingProvider;
+  String existingChatId = '';
 
   @override
   void initState() {
@@ -48,6 +50,23 @@ class _TripDetailsScreenState extends State<TripDetailsScreen> {
       context,
       listen: false,
     );
+  }
+
+  void getChatId(String chatTitle) async {
+    final chatSnapshot = await chatDao.getChatQuery().once();
+    final chatData = chatSnapshot.snapshot.value as Map<dynamic, dynamic>?;
+
+    if (chatData != null) {
+      for (final entry in chatData.entries) {
+        final chat = entry.value as Map<dynamic, dynamic>?;
+        if (chat?['title'] == chatTitle) {
+          setState(() {
+            existingChatId = entry.key;
+          });
+          return;
+        }
+      }
+    }
   }
 
   Future<TripItem> fetchData() async {
@@ -63,6 +82,8 @@ class _TripDetailsScreenState extends State<TripDetailsScreen> {
     final agencyName = trip.agencyName;
     final chatTitle = trip.name;
 
+    getChatId(trip.name);
+
     // Check if chat with same title already exists
     final chatQuery =
         chatDao.getChatQuery().orderByChild('title').equalTo(chatTitle);
@@ -70,7 +91,8 @@ class _TripDetailsScreenState extends State<TripDetailsScreen> {
 
     if (chatSnapshot.snapshot.value != null) {
       // Chat already exists, show error message to user
-      _showDialog('Error', 'A chat with this agency already exists.');
+      _showDialog(chatTitle, existingChatId, 'Already exists',
+          'A chat for this trip already exists');
       return;
     }
 
@@ -91,13 +113,14 @@ class _TripDetailsScreenState extends State<TripDetailsScreen> {
       };
 
       memberDao.getMemberRef().child(chatId as String).set(members);
-    });
 
-    // Display success message to user
-    _showDialog('Chat', 'You have successfully created a chat!');
+      // Display success message to user
+      _showDialog(chatTitle, chatId, 'Success', 'Chat created successfully');
+    });
   }
 
-  void _showDialog(String title, String content) {
+  void _showDialog(
+      String chatTitle, String chatId, String title, String content) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -105,6 +128,19 @@ class _TripDetailsScreenState extends State<TripDetailsScreen> {
           title: Text(title),
           content: Text(content),
           actions: [
+            TextButton(
+              child: const Text('Go to chat'),
+              onPressed: () {
+                Navigator.of(context).pop();
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => ChatConversationScreen(
+                        chatTitle: chatTitle, id: existingChatId),
+                  ),
+                );
+              },
+            ),
             TextButton(
               onPressed: () {
                 Navigator.of(context).pop();
