@@ -1,799 +1,400 @@
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:frontend/firebase/chat/chat.dart';
-import 'package:frontend/firebase/chat/chatDao.dart';
-import 'package:frontend/firebase/member/memberDao.dart';
-import 'package:frontend/firebase/message/messageDao.dart';
-import 'package:frontend/models/review.dart';
-import 'package:frontend/models/trip.dart';
+import 'package:frontend/firebase/chat/chat_dao.dart';
+import 'package:frontend/firebase/member/member_dao.dart';
+import 'package:frontend/models/trip_item.dart';
 import 'package:frontend/providers/auth_provider.dart';
-import 'package:frontend/services/api_service.dart';
+import 'package:frontend/providers/booking_provider.dart';
+import 'package:frontend/screens/chats/chat_conversation_screen.dart';
+import 'package:frontend/services/trip_service.dart';
 import 'package:frontend/shared/globals.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:frontend/utils/global_utils.dart';
+import 'package:frontend/widgets/image_slider_widget.dart';
+import 'package:frontend/widgets/trip_details/my_itinerary_view_widget.dart';
+import 'package:frontend/widgets/trip_details/my_review_view_widget.dart';
+import 'package:frontend/widgets/trip_details/section_display.widget.dart';
+import 'package:intl/intl.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:http/http.dart' as http;
+import 'package:flutter_stripe/flutter_stripe.dart';
+import 'dart:convert';
+
+import 'package:provider/provider.dart';
 
 class TripDetailsScreen extends StatefulWidget {
-  final Trip trip;
+  final int tripId;
   final AuthenticationProvider auth;
 
-  TripDetailsScreen({Key? key, required this.trip, required this.auth})
+  const TripDetailsScreen({Key? key, required this.tripId, required this.auth})
       : super(key: key);
 
   @override
-  _TripDetailsScreenState createState() => _TripDetailsScreenState();
+  State<TripDetailsScreen> createState() {
+    return _TripDetailsScreenState();
+  }
 }
 
 class _TripDetailsScreenState extends State<TripDetailsScreen> {
-  List<Review> reviews = [];
-  bool showAllReviews = false;
-  bool showAllItineraries = false;
+  TripService tripService = TripService();
   ChatDao chatDao = ChatDao();
-  MessageDao messageDao = MessageDao();
   MemberDao memberDao = MemberDao();
+  late Map<String, dynamic>? paymentIntent;
+  late BookingProvider bookingProvider;
+  String existingChatId = '';
 
   @override
   void initState() {
     super.initState();
-    fetchTripReviews(widget.trip.id);
+    bookingProvider = Provider.of<BookingProvider>(
+      context,
+      listen: false,
+    );
   }
 
-  void fetchTripReviews(int tripId) async {
-    Map<String, String> headers = {
-      'Authorization': 'Bearer ${widget.auth.token}'
-    };
-    String idString = tripId.toString();
-    String url = '/ratings?tripId=$idString';
-    final response = await ApiService.get(url, headers);
-    setState(() {
-      reviews =
-          (response as List).map((data) => Review.fromJson(data)).toList();
+  void getChatId(String chatTitle) async {
+    final chatSnapshot = await chatDao.getChatQuery().once();
+    final chatData = chatSnapshot.snapshot.value as Map<dynamic, dynamic>?;
+
+    if (chatData != null) {
+      for (final entry in chatData.entries) {
+        final chat = entry.value as Map<dynamic, dynamic>?;
+        if (chat?['title'] == chatTitle) {
+          setState(() {
+            existingChatId = entry.key;
+          });
+          return;
+        }
+      }
+    }
+  }
+
+  Future<TripItem> fetchData() async {
+    return tripService
+        .getTripById(widget.auth.token, widget.tripId)
+        .then((value) {
+      return value;
     });
+  }
+
+  void createChat(TripItem trip) async {
+    final username = widget.auth.username;
+    final agencyName = trip.agencyName;
+    final chatTitle = trip.name;
+
+    getChatId(trip.name);
+
+    // Check if chat with same title already exists
+    final chatQuery =
+        chatDao.getChatQuery().orderByChild('title').equalTo(chatTitle);
+    final chatSnapshot = await chatQuery.once();
+
+    if (chatSnapshot.snapshot.value != null) {
+      // Chat already exists, show error message to user
+      _showDialog(chatTitle, existingChatId, 'Already exists',
+          'A chat for this trip already exists');
+      return;
+    }
+
+    Chat chat = Chat(
+      title: chatTitle,
+      lastMessage: '',
+      timestamp: DateTime.now().millisecondsSinceEpoch,
+    );
+
+    DatabaseReference chatRef = chatDao.getChatRef().push();
+    chatRef.set(chat.toJson()).then((value) {
+      final chatId = chatRef.key;
+      chatRef.update({'id': chatId});
+
+      Map<String, dynamic> members = {
+        username: true,
+        agencyName: true,
+      };
+
+      memberDao.getMemberRef().child(chatId as String).set(members);
+
+      // Display success message to user
+      _showDialog(chatTitle, chatId, 'Success', 'Chat created successfully');
+    });
+  }
+
+  void _showDialog(
+      String chatTitle, String chatId, String title, String content) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(title),
+          content: Text(content),
+          actions: [
+            TextButton(
+              child: const Text('Go to chat'),
+              onPressed: () {
+                Navigator.of(context).pop();
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => ChatConversationScreen(
+                        chatTitle: chatTitle, id: existingChatId),
+                  ),
+                );
+              },
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text('OK'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<void> makePayment(String priceTrip) async {
+    try {
+      paymentIntent = await createPaymentIntent(priceTrip, 'PEN');
+
+      await Stripe.instance
+          .initPaymentSheet(
+              paymentSheetParameters: SetupPaymentSheetParameters(
+                  paymentIntentClientSecret: paymentIntent!['client_secret'],
+                  style: ThemeMode.dark,
+                  merchantDisplayName: 'Damian'))
+          .then((value) {});
+
+      //STEP 3: Display Payment sheet
+      displayPaymentSheet();
+    } catch (err) {
+      throw Exception(err);
+    }
+  }
+
+  displayPaymentSheet() async {
+    try {
+      await Stripe.instance.presentPaymentSheet().then((value) {
+        bookingProvider.createBooking(widget.auth.token, widget.tripId);
+        showDialog(
+            context: context,
+            builder: (_) => AlertDialog(
+                  content: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: const [
+                      Icon(
+                        Icons.check_circle,
+                        color: Colors.green,
+                        size: 100.0,
+                      ),
+                      SizedBox(height: 10.0),
+                      Text("Pago exitoso!"),
+                    ],
+                  ),
+                ));
+
+        paymentIntent = null;
+      }).onError((error, stackTrace) {
+        throw Exception(error);
+      });
+    } on StripeException catch (e) {
+      print('Error is:---> $e');
+      AlertDialog(
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Row(
+              children: const [
+                Icon(
+                  Icons.cancel,
+                  color: Colors.red,
+                ),
+                Text("Pago fallido!"),
+              ],
+            ),
+          ],
+        ),
+      );
+    } catch (e) {
+      print('$e');
+    }
+  }
+
+  createPaymentIntent(String amount, String currency) async {
+    try {
+      Map<String, dynamic> body = {
+        'amount': calculateAmount(amount),
+        'currency': currency,
+      };
+
+      //Make post request to Stripe
+      var response = await http.post(
+        Uri.parse('https://api.stripe.com/v1/payment_intents'),
+        headers: {
+          'Authorization': 'Bearer ${dotenv.env['STRIPE_SECRET']}',
+          'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        body: body,
+      );
+      return json.decode(response.body);
+    } catch (err) {
+      throw Exception(err.toString());
+    }
+  }
+
+  calculateAmount(String amount) {
+    final calculatedAmout = (int.parse(amount)) * 100;
+    return calculatedAmout.toString();
   }
 
   @override
   Widget build(BuildContext context) {
-    final sortedItineraries = widget.trip.itineraries.toList()
-      ..sort((a, b) => a.day.compareTo(b.day));
-    final visibleItineraries =
-        showAllItineraries ? sortedItineraries : sortedItineraries.take(1);
+    return FutureBuilder<TripItem>(
+      future: fetchData(),
+      builder: (BuildContext context, AsyncSnapshot<TripItem> snapshot) {
+        var data = snapshot.data as TripItem;
 
-    final sortedReviews = reviews.toList();
-    final visibleReviews =
-        showAllReviews ? sortedReviews : sortedReviews.take(3);
-
-    return Scaffold(
-      backgroundColor: Globals.backgroundColor,
-      appBar: AppBar(
-        title: Text(
-          widget.trip.name,
-          style: const TextStyle(
-              fontSize: 24.0, fontWeight: FontWeight.bold, color: Colors.white),
-        ),
-        centerTitle: true,
-        backgroundColor: Globals.redColor,
-      ),
-      body: SingleChildScrollView(
-        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Padding(
-            padding:
-                const EdgeInsets.symmetric(vertical: 16.0, horizontal: 16.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Column(
-                  children: [
-                    Icon(Icons.location_on, color: Globals.redColor),
-                    const SizedBox(height: 8.0),
-                    Text(widget.trip.destination.name,
-                        style: const TextStyle(color: Colors.white)),
-                  ],
-                ),
-                Column(
-                  children: [
-                    Icon(Icons.access_time, color: Globals.redColor),
-                    const SizedBox(height: 8.0),
-                    Text(widget.trip.category,
-                        style: const TextStyle(color: Colors.white)),
-                  ],
-                ),
-                Column(
-                  children: [
-                    Icon(Icons.group_add, color: Globals.redColor),
-                    const SizedBox(height: 8.0),
-                    Text('${widget.trip.groupSize}+',
-                        style: const TextStyle(color: Colors.white)),
-                  ],
-                ),
-                Column(
-                  children: [
-                    Icon(Icons.flash_on, color: Globals.redColor),
-                    const SizedBox(height: 8.0),
-                    Text(
-                        widget.trip.status == 'A' ? 'Available' : 'Unavailable',
-                        style: const TextStyle(color: Colors.white)),
-                  ],
-                ),
-              ],
+        return Scaffold(
+          backgroundColor: Globals.backgroundColor,
+          appBar: AppBar(
+            title: const Text(
+              "Trip details",
+              style: TextStyle(
+                  fontSize: 24.0,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white),
             ),
+            centerTitle: true,
+            backgroundColor: Globals.redColor,
           ),
-          const SizedBox(height: 16.0),
-          Container(
-            height: 300.0,
-            child: Stack(
-              children: [
-                Positioned(
-                  top: 0.0,
-                  bottom: 0.0,
-                  left: 0.0,
-                  right: 0.0,
-                  child: GestureDetector(
-                    onHorizontalDragUpdate: (details) {
-                      if (details.delta.dx > 0) {
-                        _pageController.previousPage(
-                            duration: const Duration(milliseconds: 300),
-                            curve: Curves.easeInOut);
-                      } else if (details.delta.dx < 0) {
-                        _pageController.nextPage(
-                            duration: const Duration(milliseconds: 300),
-                            curve: Curves.easeInOut);
-                      }
-                    },
-                    child: PageView.builder(
-                      controller: _pageController,
-                      itemCount: widget.trip.images.length,
-                      itemBuilder: (BuildContext context, int index) {
-                        return InkWell(
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (_) => Scaffold(
-                                  appBar: AppBar(
-                                    backgroundColor: Colors.black,
-                                  ),
-                                  body: Center(
-                                    child: Image.network(
-                                      widget.trip.images[index],
-                                      fit: BoxFit.contain,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            );
-                          },
-                          child: Image.network(
-                            widget.trip.images[index],
-                            fit: BoxFit.cover,
-                          ),
-                        );
-                      },
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 16.0),
-          Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0),
-              child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    ElevatedButton(
-                      onPressed: () {
-                        final username = widget.auth.username;
-                        final agencyName = widget.trip.agencyName;
-                        DatabaseReference chatRef = chatDao.getChatRef().push();
-                        DatabaseReference memberRef =
-                            memberDao.getMemberRef().push();
-
-                        Chat chat = Chat(
-                            title: widget.trip.name,
-                            lastMessage: "",
-                            timestamp: DateTime.now().millisecondsSinceEpoch);
-
-                        chatRef.set(chat.toJson()).then((value) {
-                          final chatId = chatRef.key;
-
-                          DatabaseReference memberChatRef = FirebaseDatabase
-                              .instance
-                              .ref()
-                              .child("members/${chatId}");
-                          memberChatRef.set({username: true, agencyName: true});
-                        });
-
-                        // display a dialog to the user
-                        showDialog(
-                            context: context,
-                            builder: (BuildContext context) {
-                              return AlertDialog(
-                                title: const Text('Chat'),
-                                content: const Text(
-                                    'You have successfully created a chat!'),
-                                actions: [
-                                  TextButton(
-                                      onPressed: () {
-                                        Navigator.of(context).pop();
-                                      },
-                                      child: const Text('OK'))
-                                ],
-                              );
-                            });
-
-                      },
-                      child: const Icon(Icons.chat, color: Colors.white),
-                    )
-                  ])),
-          const SizedBox(height: 16.0),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text(
-                  'PRICE',
-                  style: TextStyle(
-                    fontSize: 20.0,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                  ),
-                ),
-                const SizedBox(height: 8.0),
-                Container(
-                  height: 2.0,
-                  width: 50.0,
-                  color: Globals.redColor,
-                ),
-                const SizedBox(height: 8.0),
-                Text(
-                  'S./${widget.trip.price}',
-                  style: const TextStyle(fontSize: 16.0, color: Colors.white),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 16.0),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text(
-                  'CATEGORY',
-                  style: TextStyle(
-                    fontSize: 20.0,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                  ),
-                ),
-                const SizedBox(height: 8.0),
-                Container(
-                  height: 2.0,
-                  width: 50.0,
-                  color: Globals.redColor,
-                ),
-                const SizedBox(height: 8.0),
-                Text(
-                  widget.trip.category,
-                  style: const TextStyle(fontSize: 16.0, color: Colors.white),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 16.0),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text(
-                  'SEASON',
-                  style: TextStyle(
-                    fontSize: 20.0,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                  ),
-                ),
-                const SizedBox(height: 8.0),
-                Container(
-                  height: 2.0,
-                  width: 50.0,
-                  color: Globals.redColor,
-                ),
-                const SizedBox(height: 8.0),
-                Text(
-                  widget.trip.season,
-                  style: const TextStyle(fontSize: 16.0, color: Colors.white),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 16.0),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text(
-                  'DESCRIPTION',
-                  style: TextStyle(
-                    fontSize: 20.0,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                  ),
-                ),
-                const SizedBox(height: 8.0),
-                Container(
-                  height: 2.0,
-                  width: 50.0,
-                  color: Globals.redColor,
-                ),
-                const SizedBox(height: 8.0),
-                Text(
-                  widget.trip.destination.description,
-                  style: const TextStyle(fontSize: 16.0, color: Colors.white),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 16.0),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text(
-                  'ITINERARY',
-                  style: TextStyle(
-                    fontSize: 20.0,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                  ),
-                ),
-                const SizedBox(height: 8.0),
-                Container(
-                  height: 2.0,
-                  width: 50.0,
-                  color: Globals.redColor,
-                ),
-                const SizedBox(height: 8.0),
-                Column(
-                  children: visibleItineraries.map((it) {
-                    return Column(children: [
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              const SizedBox(height: 8.0),
-                              Text(
-                                'DAY ${it.day}',
-                                style: const TextStyle(
-                                  fontSize: 16.0,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white,
-                                ),
-                              ),
-                              const SizedBox(height: 8.0),
-                              const Text(
-                                'LOCATION',
-                                style: TextStyle(
-                                  fontSize: 16.0,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white,
-                                ),
-                              ),
-                              const SizedBox(height: 8.0),
-                              Text(
-                                it.location,
-                                style: const TextStyle(
-                                    fontSize: 16.0, color: Colors.white),
-                              ),
-                              const SizedBox(height: 8.0),
-                              const Text(
-                                'ACTIVITIES',
-                                style: TextStyle(
-                                  fontSize: 16.0,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white,
-                                ),
-                              ),
-                              const SizedBox(height: 8.0),
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: it.activities.map((activity) {
-                                  return Row(children: [
-                                    Text(
-                                      activity,
-                                      style: const TextStyle(
-                                          fontSize: 16.0, color: Colors.white),
-                                    )
-                                  ]);
-                                }).toList(),
-                              ),
-                              const SizedBox(height: 16.0),
-                            ],
-                          ),
-                          const SizedBox(width: 16.0),
-                        ],
-                      ),
-                      Row(
-                        children: [
-                          Expanded(
-                            child: SizedBox(
-                              height:
-                                  200.0, // Ajusta la altura del mapa según tus necesidades
-                              child: GoogleMap(
-                                  initialCameraPosition: CameraPosition(
-                                    target: LatLng(it.latitude, it.longitude),
-                                    zoom: 15.0,
-                                  ),
-                                  markers: {
-                                    Marker(
-                                      markerId:
-                                          const MarkerId('exact_location'),
-                                      position:
-                                          LatLng(it.latitude, it.longitude),
-                                      infoWindow: const InfoWindow(
-                                          title: 'Exact Location'),
-                                    ),
-                                  }),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ]);
-                  }).toList(),
-                ),
-                if (!showAllItineraries) const SizedBox(height: 16.0),
-                ElevatedButton(
-                  onPressed: () {
-                    showModalBottomSheet(
-                      context: context,
-                      isScrollControlled: true,
-                      builder: (BuildContext context) {
-                        return Container(
-                          color: Globals.backgroundColor,
-                          height: MediaQuery.of(context).size.height * .9,
-                          child: Column(
-                            children: [
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  const SizedBox(width: 16.0),
-                                  const Text(
-                                    'Itineraries',
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 24.0,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                  IconButton(
-                                    icon: const Icon(Icons.close),
-                                    onPressed: () =>
-                                        Navigator.of(context).pop(),
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(height: 16.0),
-                              Expanded(
-                                child: SingleChildScrollView(
-                                  child: Column(
-                                    children: sortedItineraries.map((it) {
-                                      return Column(children: [
-                                        Row(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            Column(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              children: [
-                                                const SizedBox(height: 8.0),
-                                                Text(
-                                                  'DAY ${it.day}',
-                                                  style: const TextStyle(
-                                                    fontSize: 16.0,
-                                                    fontWeight: FontWeight.bold,
-                                                    color: Colors.white,
-                                                  ),
-                                                ),
-                                                const SizedBox(height: 8.0),
-                                                const Text(
-                                                  'LOCATION',
-                                                  style: TextStyle(
-                                                    fontSize: 16.0,
-                                                    fontWeight: FontWeight.bold,
-                                                    color: Colors.white,
-                                                  ),
-                                                ),
-                                                const SizedBox(height: 8.0),
-                                                Text(
-                                                  it.location,
-                                                  style: const TextStyle(
-                                                      fontSize: 16.0,
-                                                      color: Colors.white),
-                                                ),
-                                                const SizedBox(height: 8.0),
-                                                const Text(
-                                                  'ACTIVITIES',
-                                                  style: TextStyle(
-                                                    fontSize: 16.0,
-                                                    fontWeight: FontWeight.bold,
-                                                    color: Colors.white,
-                                                  ),
-                                                ),
-                                                const SizedBox(height: 8.0),
-                                                Column(
-                                                  crossAxisAlignment:
-                                                      CrossAxisAlignment.start,
-                                                  children: it.activities
-                                                      .map((activity) {
-                                                    return Row(children: [
-                                                      Text(
-                                                        activity,
-                                                        style: const TextStyle(
-                                                            fontSize: 16.0,
-                                                            color:
-                                                                Colors.white),
-                                                      )
-                                                    ]);
-                                                  }).toList(),
-                                                ),
-                                                const SizedBox(height: 16.0),
-                                              ],
-                                            ),
-                                            const SizedBox(width: 16.0),
-                                          ],
-                                        ),
-                                        Row(
-                                          children: [
-                                            Expanded(
-                                              child: SizedBox(
-                                                height:
-                                                    200.0, // Ajusta la altura del mapa según tus necesidades
-                                                child: GoogleMap(
-                                                    initialCameraPosition:
-                                                        CameraPosition(
-                                                      target: LatLng(
-                                                          it.latitude,
-                                                          it.longitude),
-                                                      zoom: 15.0,
-                                                    ),
-                                                    markers: {
-                                                      Marker(
-                                                        markerId: const MarkerId(
-                                                            'exact_location'),
-                                                        position: LatLng(
-                                                            it.latitude,
-                                                            it.longitude),
-                                                        infoWindow:
-                                                            const InfoWindow(
-                                                                title:
-                                                                    'Exact Location'),
-                                                      ),
-                                                    }),
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ]);
-                                    }).toList(),
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        );
-                      },
-                    );
-                  },
-                  child: const Text('See More'),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Globals.redColor,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 16.0),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text(
-                  'REVIEWS',
-                  style: TextStyle(
-                    fontSize: 20.0,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                  ),
-                ),
-                const SizedBox(height: 8.0),
-                Container(
-                  height: 2.0,
-                  width: 50.0,
-                  color: Globals.redColor,
-                ),
-                const SizedBox(height: 8.0),
-                Column(
-                  children: visibleReviews.map((review) {
-                    return Column(
+          body: snapshot.hasData
+              ? SingleChildScrollView(
+                  child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
+                        PaginatedSlider(images: data.images),
+                        const SizedBox(height: 16.0),
                         Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                const SizedBox(height: 8.0),
-                                Row(
-                                  children: List.generate(
-                                        review.rating,
-                                        (index) => const Icon(Icons.star,
-                                            color: Colors.white, size: 16.0),
-                                      ) +
-                                      List.generate(
-                                        5 - review.rating,
-                                        (index) => const Icon(Icons.star_border,
-                                            color: Colors.white, size: 16.0),
-                                      ),
-                                ),
-                                const SizedBox(height: 8.0),
-                                Text(
-                                  'by ${review.user.email} at ',
-                                  style: const TextStyle(
-                                    fontSize: 16.0,
-                                    color: Colors.white,
-                                  ),
-                                ),
-                                const SizedBox(height: 8.0),
-                                Text(
-                                  review.comment,
-                                  style: const TextStyle(
-                                    fontSize: 16.0,
-                                    color: Colors.white,
-                                  ),
-                                ),
-                                const SizedBox(height: 16.0),
-                              ],
-                            ),
-                            const SizedBox(width: 16.0),
-                          ],
-                        ),
-                      ],
-                    );
-                  }).toList(),
-                ),
-                if (!showAllReviews)
-                  ElevatedButton(
-                    onPressed: () {
-                      showModalBottomSheet(
-                        context: context,
-                        isScrollControlled: true,
-                        builder: (BuildContext context) {
-                          return Container(
-                            height: MediaQuery.of(context).size.height * 0.9,
-                            child: Column(
-                              children: [
-                                Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    const SizedBox(width: 16.0),
-                                    const Text(
-                                      'Reviews',
-                                      style: TextStyle(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Expanded(
+                                flex: 1,
+                                child: Text(data.name,
+                                    style: const TextStyle(
                                         fontSize: 24.0,
                                         fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                    IconButton(
-                                      icon: const Icon(Icons.close),
-                                      onPressed: () =>
-                                          Navigator.of(context).pop(),
-                                    ),
-                                  ],
-                                ),
-                                const SizedBox(height: 16.0),
-                                Expanded(
-                                  child: SingleChildScrollView(
-                                    child: Column(
-                                      children: sortedReviews.map((review) {
-                                        return Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            Row(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              children: [
-                                                Column(
-                                                  crossAxisAlignment:
-                                                      CrossAxisAlignment.start,
-                                                  children: [
-                                                    const SizedBox(height: 8.0),
-                                                    Row(
-                                                      children: List.generate(
-                                                            review.rating,
-                                                            (index) =>
-                                                                const Icon(
-                                                                    Icons.star,
-                                                                    color: Colors
-                                                                        .black,
-                                                                    size: 16.0),
-                                                          ) +
-                                                          List.generate(
-                                                            5 - review.rating,
-                                                            (index) => const Icon(
-                                                                Icons
-                                                                    .star_border,
-                                                                color: Colors
-                                                                    .black,
-                                                                size: 16.0),
-                                                          ),
-                                                    ),
-                                                    const SizedBox(height: 8.0),
-                                                    Text(
-                                                      'by ${review.user.email} at ',
-                                                      style: const TextStyle(
-                                                        fontSize: 16.0,
-                                                        color: Colors.black,
-                                                      ),
-                                                    ),
-                                                    const SizedBox(height: 8.0),
-                                                    Text(
-                                                      review.comment,
-                                                      style: const TextStyle(
-                                                        fontSize: 16.0,
-                                                        color: Colors.black,
-                                                      ),
-                                                    ),
-                                                    const SizedBox(
-                                                        height: 16.0),
-                                                  ],
-                                                ),
-                                                const SizedBox(width: 16.0),
-                                              ],
-                                            ),
-                                          ],
-                                        );
-                                      }).toList(),
-                                    ),
-                                  ),
-                                ),
-                              ],
+                                        color: Colors.white)),
+                              ),
+                              if (widget.auth.isTraveler())
+                                Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      ElevatedButton(
+                                          onPressed: () {
+                                            createChat(data);
+                                          },
+                                          child: const Icon(Icons.chat,
+                                              color: Colors.white))
+                                    ]),
+                            ]),
+                        const SizedBox(height: 24.0),
+                        Row(
+                          children: [
+                            const Icon(
+                              Icons.arrow_outward,
+                              color: Colors.white,
+                              size: 16.0,
                             ),
-                          );
-                        },
-                      );
-                    },
-                    child: const Text('See More'),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Globals.redColor,
-                    ),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              flex: 1,
+                              child: Text(
+                                data.description,
+                                style: const TextStyle(
+                                    fontSize: 14.0, color: Colors.white),
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 24.0),
+                        SectionDisplayWidget(
+                            title: 'DESTINATION',
+                            content: data.destination.name,
+                            icon: Icons.arrow_outward),
+                        const SizedBox(
+                            height: 24,
+                            child: Divider(
+                              color: Colors.white10,
+                            )),
+                        SectionDisplayWidget(
+                            title: 'CATEGORY',
+                            content: data.category,
+                            icon: Icons.arrow_outward),
+                        const SizedBox(
+                            height: 24,
+                            child: Divider(
+                              color: Colors.white10,
+                            )),
+                        SectionDisplayWidget(
+                            title: 'SEASON',
+                            content: data.season.name,
+                            icon: Icons.arrow_outward),
+                        const SizedBox(
+                            height: 24,
+                            child: Divider(
+                              color: Colors.white10,
+                            )),
+                        SectionDisplayWidget(
+                            title: 'DATE',
+                            content:
+                                '${DateFormat('dd/MM').format(data.startDate)} - ${DateFormat('dd/MM').format(data.endDate)}',
+                            icon: Icons.arrow_outward),
+                        const SizedBox(height: 24.0),
+                        MyItineraryViewWidget(
+                          itineraries: data.itineraries,
+                        ),
+                        const SizedBox(height: 24.0),
+                        MyReviewViewWidget(reviews: data.reviews),
+                        const SizedBox(height: 24.0),
+                      ]),
+                ))
+              : const Center(
+                  child: CircularProgressIndicator(
+                    color: Color.fromARGB(255, 111, 111, 111),
                   ),
-              ],
+                ),
+          floatingActionButton: Visibility(
+            visible: widget.auth.isTraveler() && snapshot.hasData,
+            child: FloatingActionButton.extended(
+              onPressed: () async {
+                await makePayment(
+                    snapshot.hasData ? data.price.toInt().toString() : "0");
+              },
+              label: const Text(''),
+              icon: Row(
+                children: [
+                  Icon(Icons.shopping_cart,
+                      size: Utils.responsiveValue(context, 16.0, 20.0, 400)),
+                  SizedBox(
+                      width: Utils.responsiveValue(context, 8.0, 12.0, 400)),
+                  Text(
+                      Utils.formatPriceToPenTwoDecimals(
+                          snapshot.hasData ? data.price.toDouble() : 0.0),
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize:
+                              Utils.responsiveValue(context, 12.0, 16.0, 400))),
+                ],
+              ),
+              backgroundColor: Colors.red,
             ),
           ),
-          const SizedBox(height: 16.0),
-        ]),
-      ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () {
-          // Lógica para comprar el viaje
-        },
-        label: const Text(''),
-        icon: const Icon(Icons.shopping_cart),
-        backgroundColor: Colors.red,
-      ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
+          floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
+        );
+      },
     );
   }
-
-  final PageController _pageController = PageController();
 }

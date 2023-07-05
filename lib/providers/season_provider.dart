@@ -15,10 +15,16 @@ class SeasonProvider extends ChangeNotifier {
   Future<List<Season>> getSeasons(String? token) async {
     try {
       _season = await service.getSeasons(token);
-      return _season;
+      return sortSeasonsAlphabeticallyByFirstLetter(_season);
     } catch (e) {
       throw Exception('Failed to load data');
     }
+  }
+
+  List<Season> sortSeasonsAlphabeticallyByFirstLetter(List<Season> seasons) {
+    seasons.sort((a, b) => a.name[0].compareTo(b.name[0]));
+    notifyListeners();
+    return seasons;
   }
 
   void resetData() {

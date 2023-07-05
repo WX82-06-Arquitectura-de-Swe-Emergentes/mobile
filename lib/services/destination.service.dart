@@ -1,4 +1,4 @@
-import 'package:frontend/models/trip.dart';
+import 'package:frontend/models/destination.dart';
 import 'package:frontend/services/api_service.dart';
 
 class DestinationService {
