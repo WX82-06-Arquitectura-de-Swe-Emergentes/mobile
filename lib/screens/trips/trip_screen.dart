@@ -26,7 +26,7 @@ class _TripScreenState extends State<TripScreen>
   @override
   void initState() {
     super.initState();
-    final tripProvider = Provider.of<TripProvider>(context, listen: true);
+    // final tripProvider = Provider.of<TripProvider>(context, listen: true);
 
     _controller = TabController(length: 2, vsync: this);
 
@@ -34,7 +34,7 @@ class _TripScreenState extends State<TripScreen>
       setState(() {
         _selectedIndex = _controller.index;
       });
-      tripProvider.resetData();
+      // tripProvider.resetData();
       print("Selected Index: " + _controller.index.toString());
     });
   }

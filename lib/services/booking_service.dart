@@ -2,11 +2,12 @@ import 'package:frontend/models/booking.dart';
 import 'package:frontend/services/api_service.dart';
 
 class BookingService {
-  Future<List<Booking>> getBookings(String? token) async {
+  Future<List<Booking>> getBookings(String token, String role) async {
     List<Booking> list = [];
     Map<String, String> headers = {'Authorization': 'Bearer $token'};
 
-    final response = await ApiService.get('/bookings/my-bookings', headers);
+    final response =
+        await ApiService.get('/bookings/my-bookings?role=$role', headers);
     list = (response as List).map((data) => Booking.fromJson(data)).toList();
     return list;
   }

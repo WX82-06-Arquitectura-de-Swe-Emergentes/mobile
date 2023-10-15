@@ -17,9 +17,20 @@ class AuthenticationService {
     return await ApiService.post(endpoint, headers, body);
   }
 
-  Future<dynamic> updateUser(String email, String mobileToken) async {
+  Future<dynamic> getUser(String? token, String email) async {
+    const endpoint = '/auth/user/me';
+    final headers = {'Authorization': 'Bearer $token'};
+
+    return await ApiService.get(endpoint, headers);
+  }
+
+  Future<dynamic> updateUser(
+      String? token, String email, String mobileToken) async {
     final endpoint = '/auth/user?email=$email';
-    final headers = {'Content-Type': 'application/json'};
+    final headers = {
+      'Authorization': 'Bearer $token',
+      'Content-Type': 'application/json'
+    };
     final body = {"mobile_token": mobileToken};
 
     return await ApiService.patch(endpoint, headers, body);

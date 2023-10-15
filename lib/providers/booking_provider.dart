@@ -12,9 +12,9 @@ class BookingProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> getBookings(String? token) async {
+  Future<void> getBookings(String token, String role) async {
     try {
-      _bookings = await service.getBookings(token);
+      _bookings = await service.getBookings(token, role);
       print(_bookings);
       return;
     } catch (e) {

@@ -38,7 +38,9 @@ class _CartListScreenState extends State<CartListScreen> {
       listen: false,
     );
     // if (bookingProvider.bookings.isEmpty) {
-    await bookingProvider.getBookings(authProvider.token);
+    final String? token = authProvider.token;
+    final String? role = authProvider.role;
+    await bookingProvider.getBookings(token!, role!);
     // }
   }
 
@@ -70,7 +72,9 @@ class _CartListScreenState extends State<CartListScreen> {
           return RefreshIndicator(
             onRefresh: () async {
               setStateIfMounted(true);
-              await bookingProvider.getBookings(authProvider.token);
+              final String? token = authProvider.token;
+              final String? role = authProvider.role;
+              await bookingProvider.getBookings(token!, role!);
               setStateIfMounted(false);
             },
             child: bookings.isEmpty
@@ -81,7 +85,7 @@ class _CartListScreenState extends State<CartListScreen> {
                     scrollDirection: Axis.vertical,
                     shrinkWrap: true,
                     padding: EdgeInsets.all(
-                        Utils.responsiveValue(context, 8.0, 16.0, 400)),
+                        Utils.responsiveValue(context, 8.0, 10.0, 400)),
                     itemBuilder: (ct, i) =>
                         BookingCard(booking: bookings[i], auth: authProvider),
                     separatorBuilder: (_, __) => SizedBox(

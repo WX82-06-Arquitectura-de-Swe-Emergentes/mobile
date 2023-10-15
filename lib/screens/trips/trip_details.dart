@@ -70,7 +70,8 @@ class _TripDetailsScreenState extends State<TripDetailsScreen> {
   }
 
   Future<TripItem> fetchData() async {
-    return tripService
+    print(widget);
+    return await tripService
         .getTripById(widget.auth.token, widget.tripId)
         .then((value) {
       return value;
@@ -252,6 +253,14 @@ class _TripDetailsScreenState extends State<TripDetailsScreen> {
     return FutureBuilder<TripItem>(
       future: fetchData(),
       builder: (BuildContext context, AsyncSnapshot<TripItem> snapshot) {
+        if (!snapshot.hasData) {
+          return const Center(
+            child: CircularProgressIndicator(
+              color: Color.fromARGB(255, 111, 111, 111),
+            ),
+          );
+        }
+
         var data = snapshot.data as TripItem;
 
         return Scaffold(

@@ -33,18 +33,18 @@ class _LoginScreenState extends State<LoginScreen> {
 
     final auth = Provider.of<AuthenticationProvider>(context, listen: false);
 
-    final email = _emailController.text;
-    final password = _passwordController.text;
-    // final email = "patrick@gmail.com";
-    // final password = "admin123";
+    // final email = _emailController.text;
+    // final password = _passwordController.text;
+    const email = "viajero_fake@gmail.com";
+    const password = "admin123";
     // final email = "patrick@gmail.com";
     // final password = "admin123";
 
     try {
-      await auth.signIn(email, password);
+      final token = await auth.signIn(email, password);
 
       if (PushNotificationService.tokenValue != '') {
-        await auth.updateUser(email, PushNotificationService.tokenValue);
+        await auth.updateUser(token, email, PushNotificationService.tokenValue);
       }
 
       if (_rememberUser) {

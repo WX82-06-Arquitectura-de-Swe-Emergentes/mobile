@@ -28,10 +28,16 @@ class AuthenticationProvider extends ChangeNotifier {
     if (response.statusCode == 200) {
       final jsonBody = jsonDecode(response.body);
       _token = jsonBody["token"];
-      _username = jsonBody["username"] ?? "";
-      _role = jsonBody["role"];
+
+      final response2Body = await _authenticationService.getUser(_token, email);
+
+      _username = response2Body["username"];
+      _role = response2Body["authorities"][0]["name"];
+
+      // _username = jsonBody["username"] ?? "";
+      // _role = jsonBody["role"];
       notifyListeners();
-      return;
+      return _token;
     }
 
     if (response.statusCode == 401) {
@@ -98,9 +104,10 @@ class AuthenticationProvider extends ChangeNotifier {
     }
   }
 
-  Future<dynamic> updateUser(String email, String mobileToken) async {
+  Future<dynamic> updateUser(
+      String token, String email, String mobileToken) async {
     final response =
-        await _authenticationService.updateUser(email, mobileToken);
+        await _authenticationService.updateUser(token, email, mobileToken);
 
     if (response.statusCode == 200) {
       return;

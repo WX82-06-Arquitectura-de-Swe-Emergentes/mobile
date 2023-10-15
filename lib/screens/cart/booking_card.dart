@@ -16,7 +16,7 @@ class BookingCard extends StatelessWidget {
     return Card(
       color: Globals.primaryColor,
       child: Padding(
-        padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
+        padding: const EdgeInsets.fromLTRB(8, 4, 8, 4),
         child: Column(
           children: [
             Row(
@@ -51,7 +51,7 @@ class BookingCard extends StatelessWidget {
                               style: TextStyle(
                                   color: Colors.white,
                                   fontSize: Utils.responsiveValue(
-                                      context, 14.0, 16.0, 400),
+                                      context, 10.0, 12.0, 400),
                                   fontWeight: FontWeight.bold)),
                           const SizedBox(height: 8.0),
                           Text('Booking #${booking.id}',
@@ -75,8 +75,10 @@ class BookingCard extends StatelessWidget {
                           Row(
                             children: [
                               Container(
-                                width: 12.0,
-                                height: 12.0,
+                                width: Utils.responsiveValue(
+                                    context, 4.0, 8.0, 400),
+                                height: Utils.responsiveValue(
+                                    context, 4.0, 8.0, 400),
                                 decoration: BoxDecoration(
                                   color: booking.status == 'CONFIRMED'
                                       ? Colors.green
@@ -94,7 +96,7 @@ class BookingCard extends StatelessWidget {
                                   style: TextStyle(
                                       color: Colors.white,
                                       fontSize: Utils.responsiveValue(
-                                          context, 12.0, 14.0, 400))),
+                                          context, 10.0, 12.0, 400))),
                             ],
                           ),
                         ],
