@@ -9,10 +9,10 @@ class AuthenticationService {
     return await ApiService.post(endpoint, headers, body);
   }
 
-  Future<dynamic> signUp(String email, String password, String role) async {
+  Future<dynamic> signUp(String email, String password) async {
     const endpoint = '/auth/register';
     final headers = {'Content-Type': 'application/json'};
-    final body = {'email': email, 'password': password, 'role': role};
+    final body = {'email': email, 'password': password};
 
     return await ApiService.post(endpoint, headers, body);
   }

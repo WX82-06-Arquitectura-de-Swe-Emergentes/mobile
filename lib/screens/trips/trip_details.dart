@@ -42,6 +42,7 @@ class _TripDetailsScreenState extends State<TripDetailsScreen> {
   late Map<String, dynamic>? paymentIntent;
   late BookingProvider bookingProvider;
   String existingChatId = '';
+  dynamic tripData;
 
   @override
   void initState() {
@@ -156,8 +157,8 @@ class _TripDetailsScreenState extends State<TripDetailsScreen> {
 
   Future<void> makePayment(String priceTrip) async {
     try {
+      //STEP 1: Create payment intent
       paymentIntent = await createPaymentIntent(priceTrip, 'PEN');
-
       await Stripe.instance
           .initPaymentSheet(
               paymentSheetParameters: SetupPaymentSheetParameters(
@@ -166,7 +167,7 @@ class _TripDetailsScreenState extends State<TripDetailsScreen> {
                   merchantDisplayName: 'Damian'))
           .then((value) {});
 
-      //STEP 3: Display Payment sheet
+      //STEP 2: Display Payment sheet
       displayPaymentSheet();
     } catch (err) {
       throw Exception(err);
@@ -177,22 +178,51 @@ class _TripDetailsScreenState extends State<TripDetailsScreen> {
     try {
       await Stripe.instance.presentPaymentSheet().then((value) {
         bookingProvider.createBooking(widget.auth.token, widget.tripId);
+
         showDialog(
+          context: context,
+          builder: (_) => const AlertDialog(
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(
+                  Icons.check_circle,
+                  color: Colors.green,
+                  size: 100.0,
+                ),
+                SizedBox(height: 10.0),
+                Text("Payment Success!"),
+              ],
+            ),
+          ),
+        ).then((_) {
+          createChat(tripData);
+
+          showDialog(
             context: context,
             builder: (_) => AlertDialog(
-                  content: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: const [
-                      Icon(
-                        Icons.check_circle,
-                        color: Colors.green,
-                        size: 100.0,
-                      ),
-                      SizedBox(height: 10.0),
-                      Text("Pago exitoso!"),
-                    ],
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Icon(
+                    Icons.check_circle,
+                    color: Colors.green,
+                    size: 100.0,
                   ),
-                ));
+                  const SizedBox(height: 10.0),
+                  const Text("Package reserved!"),
+                  const SizedBox(height: 10.0),
+                  ElevatedButton(
+                    onPressed: () {
+                      Navigator.pushNamed(context, '/cart');
+                    },
+                    child: const Text('View My Packages'),
+                  ),
+                ],
+              ),
+            ),
+          );
+        });
 
         paymentIntent = null;
       }).onError((error, stackTrace) {
@@ -200,17 +230,17 @@ class _TripDetailsScreenState extends State<TripDetailsScreen> {
       });
     } on StripeException catch (e) {
       print('Error is:---> $e');
-      AlertDialog(
+      const AlertDialog(
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             Row(
-              children: const [
+              children: [
                 Icon(
                   Icons.cancel,
                   color: Colors.red,
                 ),
-                Text("Pago fallido!"),
+                Text("Payment Failed!"),
               ],
             ),
           ],
@@ -262,6 +292,7 @@ class _TripDetailsScreenState extends State<TripDetailsScreen> {
         }
 
         var data = snapshot.data as TripItem;
+        tripData = data;
 
         return Scaffold(
           backgroundColor: Globals.backgroundColor,
@@ -296,18 +327,18 @@ class _TripDetailsScreenState extends State<TripDetailsScreen> {
                                         fontWeight: FontWeight.bold,
                                         color: Colors.white)),
                               ),
-                              if (widget.auth.isTraveler())
-                                Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      ElevatedButton(
-                                          onPressed: () {
-                                            createChat(data);
-                                          },
-                                          child: const Icon(Icons.chat,
-                                              color: Colors.white))
-                                    ]),
+                              // if (widget.auth.isTraveler())
+                              //   Column(
+                              //       crossAxisAlignment:
+                              //           CrossAxisAlignment.start,
+                              //       children: [
+                              //         ElevatedButton(
+                              //             onPressed: () {
+                              //               createChat(data);
+                              //             },
+                              //             child: const Icon(Icons.chat,
+                              //                 color: Colors.white))
+                              //       ]),
                             ]),
                         const SizedBox(height: 24.0),
                         Row(
@@ -379,19 +410,27 @@ class _TripDetailsScreenState extends State<TripDetailsScreen> {
             visible: widget.auth.isTraveler() && snapshot.hasData,
             child: FloatingActionButton.extended(
               onPressed: () async {
-                await makePayment(
-                    snapshot.hasData ? data.price.toInt().toString() : "0");
+                if (data.status == "ACTIVE") {
+                  await makePayment(
+                      snapshot.hasData ? data.price.toInt().toString() : "0");
+                }
               },
               label: const Text(''),
               icon: Row(
                 children: [
-                  Icon(Icons.shopping_cart,
-                      size: Utils.responsiveValue(context, 16.0, 20.0, 400)),
+                  data.status == "ACTIVE"
+                      ? Icon(Icons.shopping_cart,
+                          size: Utils.responsiveValue(context, 16.0, 20.0, 400))
+                      : Icon(Icons.remove_shopping_cart,
+                          size:
+                              Utils.responsiveValue(context, 16.0, 20.0, 400)),
                   SizedBox(
                       width: Utils.responsiveValue(context, 8.0, 12.0, 400)),
                   Text(
-                      Utils.formatPriceToPenTwoDecimals(
-                          snapshot.hasData ? data.price.toDouble() : 0.0),
+                      (snapshot.hasData && data.status == "ACTIVE")
+                          ? Utils.formatPriceToPenTwoDecimals(
+                              data.price.toDouble())
+                          : "SOLD OUT",
                       style: TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize:

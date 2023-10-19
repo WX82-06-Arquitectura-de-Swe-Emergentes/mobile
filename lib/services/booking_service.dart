@@ -1,5 +1,6 @@
 import 'package:frontend/models/booking.dart';
 import 'package:frontend/services/api_service.dart';
+import 'dart:convert';
 
 class BookingService {
   Future<List<Booking>> getBookings(String token, String role) async {
@@ -21,6 +22,7 @@ class BookingService {
     final body = {'tripId': tripId};
 
     final response = await ApiService.post(endpoint, headers, body);
-    return Booking.fromJson(response);
+    final responseJSON = jsonDecode(response.body);
+    return Booking.fromJson(responseJSON);
   }
 }

@@ -146,7 +146,7 @@ class TripCard extends StatelessWidget {
                             width: 12.0,
                             height: 12.0,
                             decoration: BoxDecoration(
-                              color: trip.status == 'A'
+                              color: trip.status == 'ACTIVE'
                                   ? Colors.green
                                   : Colors.red,
                               shape: BoxShape.circle,
@@ -155,7 +155,7 @@ class TripCard extends StatelessWidget {
                           SizedBox(
                               width: Utils.responsiveValue(
                                   context, 2.0, 8.0, 400)),
-                          Text(trip.status == 'A' ? 'Open' : 'Closed',
+                          Text(trip.status == 'ACTIVE' ? 'Open' : 'Closed',
                               style: TextStyle(
                                   color: Colors.white,
                                   fontSize: Utils.responsiveValue(

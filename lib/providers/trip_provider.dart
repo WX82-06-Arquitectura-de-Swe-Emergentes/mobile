@@ -30,16 +30,6 @@ class TripProvider extends ChangeNotifier {
     }
   }
 
-  Future<void> getTripsByRoleViaToken(String? token, Filter? filters) async {
-    try {
-      _trips = await service.getTripsByRoleViaToken(token, filters);
-      notifyListeners();
-      return;
-    } catch (e) {
-      throw Exception('Failed to load data');
-    }
-  }
-
   void resetData() {
     _trips = [];
     notifyListeners();

@@ -37,11 +37,9 @@ class _CartListScreenState extends State<CartListScreen> {
       context,
       listen: false,
     );
-    // if (bookingProvider.bookings.isEmpty) {
     final String? token = authProvider.token;
     final String? role = authProvider.role;
     await bookingProvider.getBookings(token!, role!);
-    // }
   }
 
   void setStateIfMounted(f) {

@@ -43,29 +43,6 @@ class AppBarBack extends StatelessWidget implements PreferredSizeWidget {
         ],
       ),
     );
-
-    // return BottomNavigationBar(
-    //   currentIndex: currentIndex,
-    //   onTap: (int i) {
-    //     _navigateToScreen(context, i, auth);
-    //   },
-    //   type: BottomNavigationBarType.fixed,
-    //   backgroundColor: Globals.primaryColor,
-    //   selectedItemColor: Globals.redColor,
-    //   unselectedItemColor: Colors.blueGrey,
-    //   iconSize: 25.0,
-    //   selectedFontSize: 14.0,
-    //   unselectedFontSize: 12.0,
-    //   items: const [
-    //     BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
-    //     BottomNavigationBarItem(
-    //         icon: Icon(Icons.question_answer), label: 'Chat'),
-    //     BottomNavigationBarItem(
-    //         icon: Icon(Icons.shopping_cart), label: 'Booking'),
-    //     BottomNavigationBarItem(
-    //         icon: Icon(Icons.account_circle), label: 'Profile'),
-    //   ],
-    // );
   }
 
   // modify the method _getRoutes in main.dart to asscoiate the routes with the index

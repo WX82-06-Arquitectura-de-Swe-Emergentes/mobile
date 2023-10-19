@@ -1,6 +1,7 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:frontend/shared/globals.dart';
+import 'package:frontend/utils/global_utils.dart';
 import 'package:provider/provider.dart';
 import 'package:frontend/providers/auth_provider.dart';
 
@@ -19,7 +20,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
   bool _isLoading = false;
   bool _obscurePassword = true;
   bool _termsAccepted = false;
-  String _role = "Traveler";
   Map<String, List<dynamic>> _formErrors = {};
 
   void _handleRegister() async {
@@ -34,7 +34,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     final password = _passwordController.text;
 
     try {
-      await auth.signUp(email, password, _role.toUpperCase());
+      await auth.signUp(email, password);
 
       Future.delayed(Duration.zero, () {
         Navigator.of(context).pushReplacementNamed('/login');
@@ -83,9 +83,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
       backgroundColor: Globals.primaryColor,
       body: Padding(
         padding: EdgeInsets.fromLTRB(
-            MediaQuery.of(context).size.width < 400 ? 32.0 : 64.0,
+            Utils.responsiveValue(context, 32, 48, 400),
             0.0,
-            MediaQuery.of(context).size.width < 400 ? 32.0 : 64.0,
+            Utils.responsiveValue(context, 32, 48, 400),
             32.0),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -93,28 +93,27 @@ class _RegisterScreenState extends State<RegisterScreen> {
           children: <Widget>[
             Padding(
               padding: EdgeInsets.only(
-                  bottom:
-                      MediaQuery.of(context).size.width < 400 ? 16.0 : 32.0),
+                  bottom: Utils.responsiveValue(context, 16, 32, 400)),
               child: Column(
                 children: [
-                  const SizedBox(
-                    height: 90.0,
-                    width: 90.0,
-                    child: Image(image: AssetImage('images/logo.png')),
+                  SizedBox(
+                    height: Utils.responsiveValue(context, 64, 128, 400),
+                    width: Utils.responsiveValue(context, 64, 128, 400),
+                    child: const Image(image: AssetImage('images/logo.png')),
                   ),
                   Text(
-                    'Sign Up as $_role',
-                    style: const TextStyle(
-                      fontSize: 24.0,
+                    'Sign Up',
+                    style: TextStyle(
+                      fontSize: Utils.responsiveValue(context, 24, 32, 400),
                       fontWeight: FontWeight.bold,
                       color: Colors.white,
                     ),
                   ),
-                  const SizedBox(height: 14.0),
-                  const Text(
+                  SizedBox(height: Utils.responsiveValue(context, 8, 12, 400)),
+                  Text(
                     'Create an account to continue',
                     style: TextStyle(
-                      fontSize: 14.0,
+                      fontSize: Utils.responsiveValue(context, 12, 16, 400),
                       color: Colors.grey,
                     ),
                   ),
@@ -128,27 +127,31 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 fillColor: Colors.white,
                 enabledBorder: OutlineInputBorder(
                   borderSide: const BorderSide(color: Colors.grey),
-                  borderRadius: BorderRadius.circular(10),
+                  borderRadius: BorderRadius.circular(4),
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderSide: const BorderSide(color: Colors.blue),
-                  borderRadius: BorderRadius.circular(10),
+                  borderRadius: BorderRadius.circular(4),
                 ),
                 hintText: 'Email address',
                 contentPadding: EdgeInsets.symmetric(
-                  vertical: MediaQuery.of(context).size.width < 400 ? 10 : 20,
-                  horizontal: MediaQuery.of(context).size.width < 400 ? 10 : 20,
+                  vertical: Utils.responsiveValue(context, 8, 12, 400),
+                  horizontal: Utils.responsiveValue(context, 8, 12, 400),
                 ),
                 hintStyle: TextStyle(
-                  fontSize: MediaQuery.of(context).size.width < 400 ? 12 : 14,
+                  fontSize: Utils.responsiveValue(context, 10, 12, 400),
                 ),
               ),
             ),
+            SizedBox(height: Utils.responsiveValue(context, 1, 2, 400)),
             if (_formErrors.containsKey('email'))
               ..._formErrors['email']!
                   .map((error) => Text(
                         error,
-                        style: const TextStyle(color: Colors.red),
+                        style: TextStyle(
+                            color: Colors.red,
+                            fontSize:
+                                Utils.responsiveValue(context, 10, 12, 400)),
                       ))
                   .toList(),
             const SizedBox(height: 12.0),
@@ -159,25 +162,27 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 fillColor: Colors.white,
                 enabledBorder: OutlineInputBorder(
                   borderSide: const BorderSide(color: Colors.grey),
-                  borderRadius: BorderRadius.circular(10),
+                  borderRadius: BorderRadius.circular(4),
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderSide: const BorderSide(color: Colors.blue),
-                  borderRadius: BorderRadius.circular(10),
+                  borderRadius: BorderRadius.circular(4),
                 ),
                 hintText: 'Password',
                 contentPadding: EdgeInsets.symmetric(
-                  vertical: MediaQuery.of(context).size.width < 400 ? 10 : 20,
-                  horizontal: MediaQuery.of(context).size.width < 400 ? 10 : 20,
+                  vertical: Utils.responsiveValue(context, 8, 12, 400),
+                  horizontal: Utils.responsiveValue(context, 8, 12, 400),
                 ),
                 hintStyle: TextStyle(
-                  fontSize: MediaQuery.of(context).size.width < 400 ? 12 : 14,
+                  fontSize: Utils.responsiveValue(context, 10, 12, 400),
                 ),
                 suffixIcon: IconButton(
                   icon: Icon(
-                    _obscurePassword ? Icons.visibility_off : Icons.visibility,
-                    color: Colors.grey,
-                  ),
+                      _obscurePassword
+                          ? Icons.visibility_off
+                          : Icons.visibility,
+                      color: Colors.grey,
+                      size: Utils.responsiveValue(context, 16, 20, 400)),
                   onPressed: () {
                     setState(() {
                       _obscurePassword = !_obscurePassword;
@@ -187,11 +192,15 @@ class _RegisterScreenState extends State<RegisterScreen> {
               ),
               obscureText: _obscurePassword,
             ),
+            SizedBox(height: Utils.responsiveValue(context, 1, 2, 400)),
             if (_formErrors.containsKey('password'))
               ..._formErrors['password']!
                   .map((error) => Text(
                         error,
-                        style: const TextStyle(color: Colors.red),
+                        style: TextStyle(
+                            color: Colors.red,
+                            fontSize:
+                                Utils.responsiveValue(context, 10, 12, 400)),
                       ))
                   .toList(),
             const SizedBox(height: 5.0),
@@ -209,22 +218,30 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       MaterialStateColor.resolveWith((states) => Colors.white),
                   checkColor: Colors.red,
                 ),
-                const Text(
-                  'Acepto las políticas de privacidad y seguridad',
+                Text(
+                  'Acepto los términos y condiciones',
                   style: TextStyle(
                     color: Colors.white,
-                    fontSize: 13.0,
+                    fontSize: Utils.responsiveValue(context, 8, 12, 400),
                   ),
                 ),
               ],
             ),
             ElevatedButton(
-              onPressed: _isLoading || !_termsAccepted ? null : _handleRegister,
+              onPressed:
+                  _isLoading || !_termsAccepted ? () => {} : _handleRegister,
+              style: ButtonStyle(
+                backgroundColor: MaterialStateProperty.resolveWith<Color>(
+                  (Set<MaterialState> states) {
+                    return _termsAccepted ? Globals.redColor : Colors.grey;
+                  },
+                ),
+              ),
               child: _isLoading
                   ? const CircularProgressIndicator()
                   : const Text('SIGN UP'),
             ),
-            const SizedBox(height: 16.0),
+            SizedBox(height: Utils.responsiveValue(context, 16, 32, 400)),
             RichText(
               textAlign: TextAlign.center,
               text: TextSpan(
@@ -241,29 +258,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       ..onTap = () {
                         // Lógica del enlace aquí
                         Navigator.of(context).pushNamed('/signin');
-                      },
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 16.0),
-            RichText(
-              textAlign: TextAlign.center,
-              text: TextSpan(
-                text: 'I\'m a${_role == "Agency" ? "" : "n"} ',
-                style: const TextStyle(color: Colors.white),
-                children: <TextSpan>[
-                  TextSpan(
-                    text: _role == "Agency" ? "Traveler" : "Agency",
-                    style: const TextStyle(
-                      color: Colors.red,
-                      fontWeight: FontWeight.bold,
-                    ),
-                    recognizer: TapGestureRecognizer()
-                      ..onTap = () {
-                        setState(() {
-                          _role = _role == "Agency" ? "Traveler" : "Agency";
-                        });
                       },
                   ),
                 ],

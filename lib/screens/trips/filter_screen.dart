@@ -11,11 +11,8 @@ import 'package:frontend/utils/global_utils.dart';
 import 'package:provider/provider.dart';
 
 class FilterScreen extends StatefulWidget {
-  const FilterScreen(
-      {Key? key, required this.token, required this.currentIndex})
-      : super(key: key);
+  const FilterScreen({Key? key, required this.token}) : super(key: key);
   final String? token;
-  final dynamic currentIndex;
 
   @override
   State<FilterScreen> createState() {
@@ -101,11 +98,7 @@ class _FilterScreenState extends State<FilterScreen> {
       maxPrice: _currentRangeValues.end,
     );
 
-    if (widget.currentIndex == 0) {
-      tripProvider.getTrips(widget.token, filters);
-    } else {
-      tripProvider.getTripsByRoleViaToken(widget.token, filters);
-    }
+    tripProvider.getTrips(widget.token, filters);
 
     Navigator.of(context).pop();
   }

@@ -9,7 +9,7 @@ String buildFilterEndpoint(String baseEndpoint, Filter filters) {
   final query =
       nonNullParams.map((entry) => '${entry.key}=${entry.value}').join('&');
   final encodedQuery = Uri.encodeFull(query);
-  return '$baseEndpoint?$encodedQuery';
+  return '$baseEndpoint/filter?$encodedQuery';
 }
 
 class TripService {
@@ -33,16 +33,5 @@ class TripService {
     final endpoint = '/trips/${id.toString()}';
     final response = await ApiService.get(endpoint, headers);
     return TripItem.fromJson(response);
-  }
-
-  Future<List<Trip>> getTripsByRoleViaToken(
-      String? token, Filter? filters) async {
-    final headers = {'Authorization': 'Bearer $token'};
-    const baseEndpoint = "/trips/my-trips";
-    final endpoint = filters != null
-        ? buildFilterEndpoint(baseEndpoint, filters)
-        : baseEndpoint;
-    final response = await ApiService.get(endpoint, headers);
-    return (response as List).map((data) => Trip.fromJson(data)).toList();
   }
 }

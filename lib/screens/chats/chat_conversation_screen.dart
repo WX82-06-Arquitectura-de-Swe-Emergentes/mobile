@@ -12,7 +12,9 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 class ChatConversationScreen extends StatefulWidget {
-  const ChatConversationScreen({Key? key, required this.chatTitle, required this.id}) : super(key: key);
+  const ChatConversationScreen(
+      {Key? key, required this.chatTitle, required this.id})
+      : super(key: key);
   final String id;
   final String chatTitle;
 
@@ -168,7 +170,7 @@ class _ChatConversationScreenState extends State<ChatConversationScreen> {
     return Scaffold(
       backgroundColor: Globals.backgroundColor,
       appBar: AppBar(
-        title: Text("Chat"),
+        title: const Text("Chat"),
       ),
       body: Column(
         children: [
@@ -216,11 +218,15 @@ class _ChatConversationScreenState extends State<ChatConversationScreen> {
                                   Icons.account_circle,
                                   size: 20,
                                 ),
-                              Text(
-                                isMe ? 'Me' : name,
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  color: isMe ? Colors.white : Colors.black,
+                              Flexible(
+                                child: Text(
+                                  isMe ? 'Me' : name,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 16.0,
+                                      color:
+                                          isMe ? Colors.white : Colors.black),
                                 ),
                               ),
                             ],

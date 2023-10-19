@@ -33,12 +33,8 @@ class _LoginScreenState extends State<LoginScreen> {
 
     final auth = Provider.of<AuthenticationProvider>(context, listen: false);
 
-    // final email = _emailController.text;
-    // final password = _passwordController.text;
-    const email = "viajero_fake@gmail.com";
-    const password = "admin123";
-    // final email = "patrick@gmail.com";
-    // final password = "admin123";
+    final email = _emailController.text;
+    final password = _passwordController.text;
 
     try {
       final token = await auth.signIn(email, password);
@@ -135,9 +131,9 @@ class _LoginScreenState extends State<LoginScreen> {
         backgroundColor: Globals.primaryColor,
         body: Padding(
           padding: EdgeInsets.fromLTRB(
-              Utils.responsiveValue(context, 32.0, 64.0, 400),
+              Utils.responsiveValue(context, 32, 48, 400),
               0.0,
-              Utils.responsiveValue(context, 32.0, 64.0, 400),
+              Utils.responsiveValue(context, 32, 48, 400),
               32.0),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -147,25 +143,26 @@ class _LoginScreenState extends State<LoginScreen> {
                 padding: EdgeInsets.only(
                     bottom: Utils.responsiveValue(context, 16.0, 32.0, 400)),
                 child: Column(
-                  children: const [
+                  children: [
                     SizedBox(
-                      height: 90.0,
-                      width: 90.0,
-                      child: Image(image: AssetImage('images/logo.png')),
+                      height: Utils.responsiveValue(context, 64, 128, 400),
+                      width: Utils.responsiveValue(context, 64, 128, 400),
+                      child: const Image(image: AssetImage('images/logo.png')),
                     ),
                     Text(
                       'Sign In',
                       style: TextStyle(
-                        fontSize: 24.0,
+                        fontSize: Utils.responsiveValue(context, 24, 32, 400),
                         fontWeight: FontWeight.bold,
                         color: Colors.white,
                       ),
                     ),
-                    SizedBox(height: 14.0),
+                    SizedBox(
+                        height: Utils.responsiveValue(context, 8, 12, 400)),
                     Text(
                       'Please login to continue',
                       style: TextStyle(
-                        fontSize: 14.0,
+                        fontSize: Utils.responsiveValue(context, 12, 16, 400),
                         color: Colors.grey,
                       ),
                     ),
@@ -179,27 +176,31 @@ class _LoginScreenState extends State<LoginScreen> {
                   fillColor: Colors.white,
                   enabledBorder: OutlineInputBorder(
                     borderSide: const BorderSide(color: Colors.grey),
-                    borderRadius: BorderRadius.circular(10),
+                    borderRadius: BorderRadius.circular(4),
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderSide: const BorderSide(color: Colors.blue),
-                    borderRadius: BorderRadius.circular(10),
+                    borderRadius: BorderRadius.circular(4),
                   ),
                   hintText: 'Email address',
                   contentPadding: EdgeInsets.symmetric(
-                    vertical: Utils.responsiveValue(context, 10.0, 20.0, 400),
-                    horizontal: Utils.responsiveValue(context, 10.0, 20.0, 400),
+                    vertical: Utils.responsiveValue(context, 8, 12, 400),
+                    horizontal: Utils.responsiveValue(context, 8, 12, 400),
                   ),
                   hintStyle: TextStyle(
-                    fontSize: Utils.responsiveValue(context, 12.0, 14.0, 400),
+                    fontSize: Utils.responsiveValue(context, 10, 12, 400),
                   ),
                 ),
               ),
+              SizedBox(height: Utils.responsiveValue(context, 1, 2, 400)),
               if (_formErrors.containsKey('email'))
                 ..._formErrors['email']!
                     .map((error) => Text(
                           error,
-                          style: const TextStyle(color: Colors.red),
+                          style: TextStyle(
+                              color: Colors.red,
+                              fontSize:
+                                  Utils.responsiveValue(context, 10, 12, 400)),
                         ))
                     .toList(),
               const SizedBox(height: 12.0),
@@ -210,27 +211,27 @@ class _LoginScreenState extends State<LoginScreen> {
                   fillColor: Colors.white,
                   enabledBorder: OutlineInputBorder(
                     borderSide: const BorderSide(color: Colors.grey),
-                    borderRadius: BorderRadius.circular(10),
+                    borderRadius: BorderRadius.circular(4),
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderSide: const BorderSide(color: Colors.blue),
-                    borderRadius: BorderRadius.circular(10),
+                    borderRadius: BorderRadius.circular(4),
                   ),
                   hintText: 'Password',
                   contentPadding: EdgeInsets.symmetric(
-                    vertical: Utils.responsiveValue(context, 10.0, 20.0, 400),
-                    horizontal: Utils.responsiveValue(context, 10.0, 20.0, 400),
+                    vertical: Utils.responsiveValue(context, 8, 12, 400),
+                    horizontal: Utils.responsiveValue(context, 8, 12, 400),
                   ),
                   hintStyle: TextStyle(
-                    fontSize: Utils.responsiveValue(context, 12.0, 14.0, 400),
+                    fontSize: Utils.responsiveValue(context, 10, 12, 400),
                   ),
                   suffixIcon: IconButton(
                     icon: Icon(
-                      _obscurePassword
-                          ? Icons.visibility_off
-                          : Icons.visibility,
-                      color: Colors.grey,
-                    ),
+                        _obscurePassword
+                            ? Icons.visibility_off
+                            : Icons.visibility,
+                        color: Colors.grey,
+                        size: Utils.responsiveValue(context, 16, 20, 400)),
                     onPressed: () {
                       setState(() {
                         _obscurePassword = !_obscurePassword;
@@ -240,12 +241,14 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
                 obscureText: _obscurePassword,
               ),
+              SizedBox(height: Utils.responsiveValue(context, 1, 2, 400)),
               if (_formErrors.containsKey('password'))
                 ..._formErrors['password']!
-                    .map((error) => Text(
-                          error,
-                          style: const TextStyle(color: Colors.red),
-                        ))
+                    .map((error) => Text(error,
+                        style: TextStyle(
+                            color: Colors.red,
+                            fontSize:
+                                Utils.responsiveValue(context, 10, 12, 400))))
                     .toList(),
               //Recordar Usuario
               const SizedBox(height: 5.0),
@@ -263,11 +266,11 @@ class _LoginScreenState extends State<LoginScreen> {
                         (states) => Colors.white),
                     checkColor: Colors.red,
                   ),
-                  const Text(
+                  Text(
                     'Guardar mis credenciales',
                     style: TextStyle(
                       color: Colors.white,
-                      fontSize: 14.0,
+                      fontSize: Utils.responsiveValue(context, 8, 12, 400),
                     ),
                   ),
                 ],
@@ -276,9 +279,9 @@ class _LoginScreenState extends State<LoginScreen> {
                 onPressed: _isLoading ? null : _handleLogin,
                 child: _isLoading
                     ? const CircularProgressIndicator()
-                    : const Text('Login to your account'),
+                    : const Text('LOGIN TO YOUR ACCOUNT'),
               ),
-              const SizedBox(height: 16.0),
+              SizedBox(height: Utils.responsiveValue(context, 16, 32, 400)),
               RichText(
                 textAlign: TextAlign.center,
                 text: TextSpan(

@@ -34,8 +34,6 @@ class AuthenticationProvider extends ChangeNotifier {
       _username = response2Body["username"];
       _role = response2Body["authorities"][0]["name"];
 
-      // _username = jsonBody["username"] ?? "";
-      // _role = jsonBody["role"];
       notifyListeners();
       return _token;
     }
@@ -70,8 +68,8 @@ class AuthenticationProvider extends ChangeNotifier {
     }
   }
 
-  Future<dynamic> signUp(String email, String password, String role) async {
-    final response = await _authenticationService.signUp(email, password, role);
+  Future<dynamic> signUp(String email, String password) async {
+    final response = await _authenticationService.signUp(email, password);
 
     if (response.statusCode == 200) {
       final jsonBody = jsonDecode(response.body);
