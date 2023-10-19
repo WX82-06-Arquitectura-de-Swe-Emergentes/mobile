@@ -79,10 +79,10 @@ class _TripDetailsScreenState extends State<TripDetailsScreen> {
     });
   }
 
-  void createChat(TripItem trip) async {
+  void createChat(TripItem trip, int bookingId) async {
     final username = widget.auth.username;
     final agencyName = trip.agencyName;
-    final chatTitle = trip.name;
+    final chatTitle = "Booking-$bookingId-${trip.name}";
 
     getChatId(trip.name);
 
@@ -177,51 +177,54 @@ class _TripDetailsScreenState extends State<TripDetailsScreen> {
   displayPaymentSheet() async {
     try {
       await Stripe.instance.presentPaymentSheet().then((value) {
-        bookingProvider.createBooking(widget.auth.token, widget.tripId);
-
-        showDialog(
-          context: context,
-          builder: (_) => const AlertDialog(
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(
-                  Icons.check_circle,
-                  color: Colors.green,
-                  size: 100.0,
-                ),
-                SizedBox(height: 10.0),
-                Text("Payment Success!"),
-              ],
-            ),
-          ),
-        ).then((_) {
-          createChat(tripData);
-
+        bookingProvider
+            .createBooking(widget.auth.token, widget.tripId)
+            .then((bookingId) {
+          print('Booking ID: $bookingId');
           showDialog(
             context: context,
-            builder: (_) => AlertDialog(
+            builder: (_) => const AlertDialog(
               content: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  const Icon(
+                  Icon(
                     Icons.check_circle,
                     color: Colors.green,
                     size: 100.0,
                   ),
-                  const SizedBox(height: 10.0),
-                  const Text("Package reserved!"),
-                  const SizedBox(height: 10.0),
-                  ElevatedButton(
-                    onPressed: () {
-                      Navigator.pushNamed(context, '/cart');
-                    },
-                    child: const Text('View My Packages'),
-                  ),
+                  SizedBox(height: 10.0),
+                  Text("Payment Success!"),
                 ],
               ),
             ),
-          );
+          ).then((_) {
+            createChat(tripData, bookingId);
+
+            showDialog(
+              context: context,
+              builder: (_) => AlertDialog(
+                content: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(
+                      Icons.check_circle,
+                      color: Colors.green,
+                      size: 100.0,
+                    ),
+                    const SizedBox(height: 10.0),
+                    const Text("Package reserved!"),
+                    const SizedBox(height: 10.0),
+                    ElevatedButton(
+                      onPressed: () {
+                        Navigator.pushNamed(context, '/cart');
+                      },
+                      child: const Text('View My Packages'),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          });
         });
 
         paymentIntent = null;

@@ -23,12 +23,12 @@ class BookingProvider extends ChangeNotifier {
     }
   }
 
-  Future<void> createBooking(String? token, int tripId) async {
+  Future<int> createBooking(String? token, int tripId) async {
     try {
       final booking = await service.createBooking(token, tripId);
       _bookings.add(booking);
       notifyListeners();
-      return;
+      return booking.id;
     } catch (e) {
       print(e);
       throw Exception('Failed to load data');
