@@ -1,25 +1,26 @@
 import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
+import 'package:frontend/enums.dart';
 import 'package:frontend/services/authentication_service.dart';
 
 class AuthenticationProvider extends ChangeNotifier {
   String? _token;
   String _username = "";
-  String? _role;
+  Role? _role;
 
   String? get token => _token;
   String get username => _username;
-  String? get role => _role;
+  Role? get role => _role;
 
   final _authenticationService = AuthenticationService();
 
   bool isAgency() {
-    return _role == "AGENCY";
+    return _role == Role.AGENCY;
   }
 
   bool isTraveler() {
-    return _role == "TRAVELER";
+    return _role == Role.TRAVELER;
   }
 
   Future<dynamic> signIn(String email, String password) async {
@@ -32,7 +33,7 @@ class AuthenticationProvider extends ChangeNotifier {
       final response2Body = await _authenticationService.getUser(_token, email);
 
       _username = response2Body["username"];
-      _role = response2Body["authorities"][0]["name"];
+      _role = getRoleFromString(response2Body["authorities"][0]["name"]);
 
       notifyListeners();
       return _token;

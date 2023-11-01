@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/providers/auth_provider.dart';
-import 'package:frontend/screens/cart/cart_list_screen.dart';
-import 'package:frontend/shared/globals.dart';
-import 'package:frontend/widgets/app_bar.dart';
+import 'package:frontend/screens/cart/agency/agency_booking_screen.dart';
+import 'package:frontend/screens/cart/traveler/traveler_booking_screen.dart';
 import 'package:provider/provider.dart';
 
 class CartScreen extends StatelessWidget {
@@ -15,18 +14,8 @@ class CartScreen extends StatelessWidget {
       listen: false,
     );
 
-    bool isAgency() {
-      return authProvider.role == 'AGENCY';
-    }
-
-    return Scaffold(
-      backgroundColor: Globals.backgroundColor,
-      bottomNavigationBar: const AppBarBack(),
-      appBar: AppBar(
-        title: Text("${isAgency() ? "Agency" : "Traveler"} Bookings"),
-        backgroundColor: Globals.redColor,
-      ),
-      body: const CartListScreen(),
-    );
+    return authProvider.isAgency()
+        ? const AgencyBookingScreen()
+        : const TravelerBookingScreen();
   }
 }

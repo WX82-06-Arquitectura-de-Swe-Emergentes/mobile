@@ -1,3 +1,5 @@
+// ignore_for_file: unused_element
+
 import 'package:flutter/material.dart';
 import 'package:frontend/providers/auth_provider.dart';
 import 'package:frontend/shared/globals.dart';
@@ -7,7 +9,7 @@ class AccountSettingScreen extends StatefulWidget {
   final String? token;
 
   @override
-  _AccountSettingScreenState createState() => _AccountSettingScreenState();
+  State<AccountSettingScreen> createState() => _AccountSettingScreenState();
 }
 
 class _AccountSettingScreenState extends State<AccountSettingScreen> {
@@ -16,10 +18,11 @@ class _AccountSettingScreenState extends State<AccountSettingScreen> {
 
   final TextEditingController _oldEmailController = TextEditingController();
   final TextEditingController _newEmailController = TextEditingController();
-  TextEditingController _emailController = TextEditingController();
-  TextEditingController _oldPasswordController = TextEditingController();
-  TextEditingController _newPasswordController = TextEditingController();
-  TextEditingController _confirmPasswordController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _oldPasswordController = TextEditingController();
+  final TextEditingController _newPasswordController = TextEditingController();
+  final TextEditingController _confirmPasswordController =
+      TextEditingController();
 
   void _showDeleteAccountDialog() {
     showDialog(

@@ -7,7 +7,6 @@ class ApiService {
 
   static Future<dynamic> get(
       String endpoint, Map<String, String>? headers) async {
-    print(Uri.parse(baseUrl + endpoint));
     final response =
         await http.get(Uri.parse(baseUrl + endpoint), headers: headers);
     if (response.statusCode == 200) {

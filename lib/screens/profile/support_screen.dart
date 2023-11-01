@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:frontend/shared/globals.dart';
 
@@ -6,12 +5,14 @@ class SupportScreen extends StatefulWidget {
   const SupportScreen({Key? key}) : super(key: key);
 
   @override
-  _SupportScreenState createState() => _SupportScreenState();
+  State<SupportScreen> createState() {
+    return _SupportScreenState();
+  }
 }
 
 class _SupportScreenState extends State<SupportScreen> {
-  TextEditingController _questionController = TextEditingController();
-  TextEditingController _problemController = TextEditingController();
+  final TextEditingController _questionController = TextEditingController();
+  final TextEditingController _problemController = TextEditingController();
 
   @override
   void dispose() {

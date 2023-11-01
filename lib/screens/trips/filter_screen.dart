@@ -279,8 +279,8 @@ class _FilterScreenState extends State<FilterScreen> {
                                   _selectedDestination = destination;
                                 });
                               },
-                              child: Row(
-                                children: const [
+                              child: const Row(
+                                children: [
                                   Text(
                                     'View All',
                                     style: TextStyle(
@@ -447,8 +447,8 @@ class _FilterScreenState extends State<FilterScreen> {
                                   _selectedSeason = season;
                                 });
                               },
-                              child: Row(
-                                children: const [
+                              child: const Row(
+                                children: [
                                   Text(
                                     'View All',
                                     style: TextStyle(

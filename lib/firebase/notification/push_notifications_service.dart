@@ -1,5 +1,6 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/foundation.dart';
 import 'dart:async';
 
 import 'package:frontend/services/api_service.dart';
@@ -45,7 +46,10 @@ class PushNotificationService {
   static Future initializeApp() async {
     await Firebase.initializeApp();
     token = await messaging.getToken();
-    print(token);
+
+    if (kDebugMode) {
+      print(token);
+    }
 
     FirebaseMessaging.onBackgroundMessage(_backgroundHandler);
     FirebaseMessaging.onMessage.listen(_onMessageHandler);

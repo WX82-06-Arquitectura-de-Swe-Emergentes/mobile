@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/screens/profile/account_setting_screen.dart';
-import 'package:frontend/screens/profile/privacyPolicy_screen.dart';
+import 'package:frontend/screens/profile/privacy_policy_screen.dart';
 import 'package:frontend/screens/profile/notification_screen.dart';
 import 'package:frontend/screens/profile/support_screen.dart';
 import 'package:frontend/shared/globals.dart';
@@ -22,7 +22,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Widget build(BuildContext context) {
     final authenticationProvider = Provider.of<AuthenticationProvider>(context);
     final username = authenticationProvider.username;
-    final role = authenticationProvider.role;
+    final role = authenticationProvider.isAgency() ? "Agency" : "Traveler";
 
     return Scaffold(
       backgroundColor: Globals.backgroundColor,
@@ -73,7 +73,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           ),
                         ),
                         Text(
-                          '$role',
+                          role,
                           style:
                               const TextStyle(fontSize: 15, color: Colors.grey),
                         ),

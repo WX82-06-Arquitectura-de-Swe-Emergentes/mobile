@@ -1,15 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:frontend/firebase/notification/push_notifications_service.dart';
 import 'package:frontend/providers/auth_provider.dart';
 import 'package:frontend/providers/booking_provider.dart';
 import 'package:frontend/providers/destination_provider.dart';
 import 'package:frontend/providers/season_provider.dart';
 import 'package:frontend/providers/trip_provider.dart';
+import 'package:frontend/screens/auth/login_screen.dart';
+import 'package:frontend/screens/auth/register_screen.dart';
 import 'package:frontend/screens/cart/cart_screen.dart';
 import 'package:frontend/screens/chats/chat_list_screen.dart';
-import 'package:frontend/screens/login_screen.dart';
 import 'package:frontend/screens/profile/profile_screen.dart';
-import 'package:frontend/screens/register_screen.dart';
 import 'package:frontend/screens/trips/trip_screen.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -65,7 +66,9 @@ class _MyAppState extends State<MyApp> {
 
     // Tenemos acceso al context
     PushNotificationService.messagesStream.listen((message) {
-      print("Message $message");
+      if (kDebugMode) {
+        print("Message $message");
+      }
 
       // Navigator.of(context).pushNamed('/chat', arguments: event);
     });

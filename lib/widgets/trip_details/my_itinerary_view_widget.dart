@@ -16,7 +16,7 @@ class MyItineraryViewWidget extends StatelessWidget {
 
     return Column(
       children: [
-        Row(mainAxisAlignment: MainAxisAlignment.start, children: const [
+        const Row(mainAxisAlignment: MainAxisAlignment.start, children: [
           Text(
             'Trip Itinerary',
             style: TextStyle(
@@ -49,10 +49,6 @@ class ItineraryItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    for (final activity in itinerary.activities) {
-      print(activity.toString());
-    }
-
     Future<void> openMap(
         String location, double latitude, double longitude) async {
       await Navigator.push(

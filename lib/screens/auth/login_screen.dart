@@ -55,6 +55,7 @@ class _LoginScreenState extends State<LoginScreen> {
     } on ApiException catch (e) {
       if (e.message != '') {
         // Si el login falla, muestra un mensaje de error
+        // ignore: use_build_context_synchronously
         showDialog(
           context: context,
           builder: (ctx) => AlertDialog(

@@ -14,11 +14,6 @@ String buildFilterEndpoint(String baseEndpoint, Filter filters) {
 
 class TripService {
   Future<List<Trip>> getTrips(String? token, Filter? filters) async {
-    print("Getting trips");
-    if (filters != null) {
-      print(filters.toJson());
-    }
-
     final headers = {'Authorization': 'Bearer $token'};
     const baseEndpoint = '/trips';
     final endpoint = filters != null
