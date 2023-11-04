@@ -1,16 +1,10 @@
-# frontend
+Implementación Flutter DDD
 
-A new Flutter project.
+Bounded contexts
 
-## Getting Started
-
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+1. Identity and Access Management (IAM) (identity_access_management)
+2. Subscription and Payments (subscription_payments)
+3. Profiles & Social Interaction (profiles_social_interaction)
+4. Customer Relationship and Communication Management (customer_relationship_communication)
+5. Travel Experience Design and Maintenance (travel_experience_design_maintenance)
+6. Travel Experience Booking and Tracking (travel_experience_booking_tracking)

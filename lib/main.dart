@@ -1,39 +1,46 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
-import 'package:frontend/firebase/notification/push_notifications_service.dart';
-import 'package:frontend/providers/auth_provider.dart';
-import 'package:frontend/providers/booking_provider.dart';
-import 'package:frontend/providers/destination_provider.dart';
-import 'package:frontend/providers/season_provider.dart';
-import 'package:frontend/providers/trip_provider.dart';
-import 'package:frontend/screens/auth/login_screen.dart';
-import 'package:frontend/screens/auth/register_screen.dart';
-import 'package:frontend/screens/cart/cart_screen.dart';
-import 'package:frontend/screens/chats/chat_list_screen.dart';
-import 'package:frontend/screens/profile/profile_screen.dart';
-import 'package:frontend/screens/trips/trip_screen.dart';
+import 'package:frontend/customer_relationship_communication/infrastructure/notification/fcm/firebase_cloud_messagging_service.dart';
+import 'package:frontend/customer_relationship_communication/presentation/customer_relationship_communication/chat_list_screen.dart';
+import 'package:frontend/identity_access_management/api/index.dart';
+import 'package:frontend/identity_access_management/presentation/identity_access_management/login_screen.dart';
+import 'package:frontend/identity_access_management/presentation/identity_access_management/register_screen.dart';
+import 'package:frontend/profiles_social_interaction/presentation/profiles_social_interaction/profile_screen.dart';
+import 'package:frontend/travel_experience_booking_tracking/api/index.dart';
+import 'package:frontend/travel_experience_booking_tracking/presentation/travel_experience_booking_tracking/cart_screen.dart';
+import 'package:frontend/travel_experience_design_maintenance/api/index.dart';
+import 'package:frontend/travel_experience_design_maintenance/presentation/travel_experience_design_maintenance/trip_screen.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
+import './injections.dart' as di;
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  PushNotificationService.initializeApp();
+  FCMService.initializeApp();
 
   Stripe.publishableKey =
       "pk_test_51NEOG0BCaaBopW0JuSz4FUfcLLCJ4jSJw4xEn1EihJEwzVff4e19mGmo8dMnS9WeUxEFb8sSIoxnEeKrsfNT1YSN002vyYOYkQ";
   await dotenv.load(fileName: "assets/.env");
 
+  await di.init();
+
   runApp(MultiProvider(
     providers: [
-      ChangeNotifierProvider<AuthenticationProvider>(
-        create: (_) => AuthenticationProvider(),
+      /// Identity Access Management
+      ChangeNotifierProvider<IdentityAccessManagementApi>(
+        create: (_) => IdentityAccessManagementApi(),
       ),
-      ChangeNotifierProvider<BookingProvider>(create: (_) => BookingProvider()),
-      ChangeNotifierProvider<TripProvider>(create: (_) => TripProvider()),
-      ChangeNotifierProvider<SeasonProvider>(create: (_) => SeasonProvider()),
-      ChangeNotifierProvider<DestinationProvider>(
-          create: (_) => DestinationProvider()),
+
+      /// Travel Experience Design Maintenance
+      ChangeNotifierProvider<TravelExperienceDesignMaintenanceApi>(
+        create: (_) => TravelExperienceDesignMaintenanceApi(),
+      ),
+
+      // Travel Experience Booking Tracking
+      ChangeNotifierProvider<TravelExperienceBookingTrackingApi>(
+        create: (_) => TravelExperienceBookingTrackingApi(),
+      ),
     ],
     child: const MyApp(),
   ));
@@ -41,12 +48,12 @@ Future<void> main() async {
 
 Map<String, WidgetBuilder> _getRoutes() {
   return {
-    '/signin': (context) => const LoginScreen(),
-    '/signup': (context) => const RegisterScreen(),
-    '/trip': (context) => const TripScreen(),
-    '/chat': (context) => const ChatListScreen(),
-    '/cart': (context) => const CartScreen(),
-    '/profile': (context) => const ProfileScreen(),
+    '/signin': (context) => const LoginScreen(), //
+    '/signup': (context) => const RegisterScreen(), //
+    '/trip': (context) => const TripScreen(), //
+    '/chat': (context) => const ChatListScreen(), //
+    '/cart': (context) => const CartScreen(), //
+    '/profile': (context) => const ProfileScreen(), //
   };
 }
 
@@ -65,7 +72,7 @@ class _MyAppState extends State<MyApp> {
     super.initState();
 
     // Tenemos acceso al context
-    PushNotificationService.messagesStream.listen((message) {
+    FCMService.messagesStream.listen((message) {
       if (kDebugMode) {
         print("Message $message");
       }
