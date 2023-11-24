@@ -40,6 +40,32 @@ class RealtimeDatabaseService {
     // return chats.map((e) => ChatModel.fromJson(e)).toList();
   }
 
+  Future<List<Map>> loadChatBotLastMessages(
+      int numberMessages, String chatId) async {
+    final messages = <Map<dynamic, dynamic>>[];
+
+    Query messageQuery = database.child('messages').orderByChild('timestamp');
+
+    await messageQuery.get().then((DataSnapshot snapshot) {
+      final json = snapshot.value as Map<dynamic, dynamic>;
+      final messageJson = json[chatId] as Map<dynamic, dynamic>;
+
+      if (json.containsKey(chatId)) {
+        messageJson.forEach((key, value) {
+          if (value['name'] == "adventurebot" &&
+              messages.length < numberMessages) {
+            messages.add(value);
+          }
+        });
+      }
+
+      print('messages : $messages');
+    });
+
+    print(messages);
+    return messages;
+  }
+
   Future<String> findReceptor(String username, String chatId) async {
     final emisor = username;
     final memberQuery = _memberDao.getMemberRef().child(chatId);

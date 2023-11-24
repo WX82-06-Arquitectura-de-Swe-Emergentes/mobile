@@ -9,6 +9,8 @@ import 'package:frontend/customer_relationship_communication/infrastructure/noti
 import 'package:frontend/identity_access_management/api/index.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 class ChatConversationScreen extends StatefulWidget {
   const ChatConversationScreen(
@@ -96,12 +98,36 @@ class _ChatConversationScreenState extends State<ChatConversationScreen> {
 
   void _sendMessage() async {
     final messageText = _textController.text.trim();
+    String username = authProvider.username;
+    String chatId = widget.id;
+
     if (messageText.isNotEmpty) {
-      String username = authProvider.username;
-      String chatId = widget.id;
       realtimeDatabaseService.sendMessage(username, chatId, messageText);
-      _textController.clear();
+      if (widget.chatTitle == "chatbot") {
+        print("Enviando mensaje al chatbot");
+        _sendChatBotMessage(messageText);
+      }
     }
+    _textController.clear();
+  }
+
+  void _sendChatBotMessage(String currentMessage) async {
+    const url = 'https://2fb872mk-5000.brs.devtunnels.ms/message';
+    final headers = {'Content-Type': 'application/json'};
+    final body = {"chat_id": widget.id, "messages": []};
+
+    List<Map> messages =
+        await realtimeDatabaseService.loadChatBotLastMessages(2, widget.id);
+
+    final bodyMessages = [
+      ...messages.map((e) => e['message']).toList(),
+      currentMessage
+    ];
+    body['messages'] = bodyMessages;
+
+   await http.post(Uri.parse(url),
+        headers: headers, body: jsonEncode(body));
+    // final json = jsonDecode(response.body);
   }
 
   String formatTimestampToHour(int timestamp) {
